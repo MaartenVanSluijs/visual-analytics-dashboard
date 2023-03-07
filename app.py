@@ -26,6 +26,11 @@ if __name__ == '__main__':
                             {"label": "Normalized Difference Vegetation Index", "value": "NDVI"}
                         ],
                         value="RGB"
+                    ),
+                    dcc.Slider(
+                        1,12,1,
+                        value=1,
+                        id= "mc3_image_slider"
                     )
                 ]
             )
@@ -35,10 +40,11 @@ if __name__ == '__main__':
     @app.callback(
         Output(mc3.html_id, "figure"),[
             Input(mc3.html_id, "clickData"),
-            Input("mc3_image_type", "value")
+            Input("mc3_image_type", "value"),
+            Input("mc3_image_slider", "value")
         ]
     )
-    def update_test(click_data, image_type):
-        return mc3.update(image_type)
+    def update_test(click_data, image_type, image_number):
+        return mc3.update(image_type, image_number, ctx.triggered_id)
 
     app.run_server(debug=True, dev_tools_ui=True)
