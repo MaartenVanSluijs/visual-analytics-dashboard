@@ -1,10 +1,10 @@
 from src.main import app
-from dash import html, ctx
+from dash import html, ctx, dcc
 from dash.dependencies import Input, Output
 from src.plots.MC3 import MC3
 
 if __name__ == '__main__':
-    test = MC3("test")
+    mc3 = MC3("mc3")
 
 
     # Create the app
@@ -12,21 +12,33 @@ if __name__ == '__main__':
         id="app-container",
         children=[
             html.Div(
-                id="test",
+                id="MC3",
                 className="nine columns",
                 children=[
-                    test
+                    mc3,
+                    dcc.Dropdown(
+                        id="mc3_image_type",
+                        options=[
+                            {"label": "RGB", "value": "RGB"},
+                            {"label": "Plant Health", "value": "plant_health"},
+                            {"label": "Floods or Fires", "value": "floods_or_burned"},
+                            {"label": "Snow, Ice, Clouds", "value": "snow_ice_clouds"},
+                            {"label": "Normalized Difference Vegetation Index", "value": "NDVI"}
+                        ],
+                        value="RGB"
+                    )
                 ]
             )
         ],
     )
 
     @app.callback(
-        Output(test.html_id, "figure"),[
-            Input(test.html_id, "clickData")
+        Output(mc3.html_id, "figure"),[
+            Input(mc3.html_id, "clickData"),
+            Input("mc3_image_type", "value")
         ]
     )
-    def update_test(click_data):
-        return test.update()
+    def update_test(click_data, image_type):
+        return mc3.update(image_type)
 
     app.run_server(debug=True, dev_tools_ui=True)

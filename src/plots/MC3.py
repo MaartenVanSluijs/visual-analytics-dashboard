@@ -11,7 +11,6 @@ class MC3(html.Div):
         super().__init__(
             className="graph_card",
             children=[
-                html.H6(name),
                 dcc.Graph(id=self.html_id)
             ],
         )
@@ -24,7 +23,8 @@ class MC3(html.Div):
         image_json = json.load(file)
         return image_json
 
-    def update(self):
-        image = np.array(self.data["RGB"], dtype=np.uint8)
+    def update(self, image_type):
+        dtype = np.uint8 if image_type != "NDVI" else None 
+        image = np.array(self.data[image_type], dtype=dtype)
         fig = px.imshow(image)
         return fig
