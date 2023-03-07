@@ -1,4 +1,4 @@
-from src.main import app
+from App.main import app
 from dash import html, ctx
 from dash.dependencies import Input, Output
 
