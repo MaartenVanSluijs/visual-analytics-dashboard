@@ -3,7 +3,7 @@ from dash import dcc, html
 import plotly.express as px
 
 def process_data():
-    df = pd.read_csv("data/SensorData.csv")
+    df = pd.read_csv("data\MC1\SensorData.csv")
     print(df.head())
 
     # set types
