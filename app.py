@@ -5,6 +5,7 @@ from src.plots.MC1 import MC1
 
 if __name__ == '__main__':
     mc1 = MC1("mc1")
+    year_months = mc1.year_months
 
     # Create the app
     app.layout = html.Div(
@@ -22,7 +23,7 @@ if __name__ == '__main__':
 
     @app.callback(
         Output(mc1.html_id, "figure"),[
-            Input(mc1.html_id, "clickData")
+            Input(mc1.html_id, "clickData"),
         ]
     )
 
