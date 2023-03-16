@@ -2,4 +2,4 @@ from dash import Dash
 
 
 app = Dash(__name__)
-app.title = "Visualization Assignment"
+app.title = "Visual Analytics Assignment"
