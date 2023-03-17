@@ -1,6 +1,5 @@
 from src.main import app
 from src.menu import generate_header, generate_control_card
-from data.MC1 import data_cleanup
 from data.MC1.data import get_data 
 
 from src.plots.MC1 import MC1
@@ -11,9 +10,8 @@ from dash.dependencies import Input, Output
 
 
 if __name__ == '__main__':
-    df_mc1 = get_data()
     # len_shortest_paths, shortest_paths = data_cleanup.shortest_paths()
-    mc1 = MC1("mc1", df_mc1)
+    mc1 = MC1("mc1")
     entrance = Entrance_plot("entrance")
 
     # Create the app

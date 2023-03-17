@@ -4,11 +4,11 @@ import json
 import numpy as np
 import plotly.graph_objects as go
 from matplotlib import image, pyplot
+from data.MC1.data import get_data
 
 class MC1(html.Div):
-    def __init__(self, name, df):
+    def __init__(self, name):
         self.html_id = name.lower().replace(" ", "-")
-        self.df = df
     
         # Equivalent to `html.Div([...])`
         super().__init__(
@@ -19,6 +19,7 @@ class MC1(html.Div):
         )
         
         self.image = image.imread("data\MC1\Lekagul Roadways.bmp")
+        self.df = get_data()
 
         self.fig = go.Figure()
 

@@ -29,6 +29,6 @@ class Entrance_plot(html.Div):
 
         data_per_entrance["percentage"] = round((data_per_entrance["count"] / total_count) * 100, 2)
 
-        fig = px.bar(data_per_entrance, x="gate-name", y="percentage", hover_data=["percentage", "count"], width=400, height= 400)
+        fig = px.bar(data_per_entrance, x="gate-name", y="percentage", hover_data=["percentage", "count"], width=400, height= 300)
 
         return fig
