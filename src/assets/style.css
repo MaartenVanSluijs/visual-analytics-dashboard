@@ -1,0 +1,72 @@
+body {
+    background-color: #0E0B16;
+    color: #E7DFDD;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    margin: 0px;
+}
+
+#left-column {
+    padding: 20px 2rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+#right-column {
+    background-color: #0E0B16;
+    padding: 0rem 2rem;
+    min-height: 100vh;
+    margin-left: 10px;
+}
+
+h5 {
+    color: #E7DFDD;
+    font-weight: 300;
+}
+
+h1 {
+    margin: 20px 0px;
+    color: #4717F6;
+    font-weight: 800;
+}
+
+#intro {
+    margin: 20px 0px;
+    text-align: justify;
+}
+
+#control-card label {
+    font-weight: normal;
+}
+
+#control-card {
+    background-color: #0E0B16;
+    border-radius: 0.675rem;
+    padding: 1rem;
+}
+
+.graph_card {
+    background-color: #0E0B16;
+    border-radius: 0.675rem;
+    padding: 1rem;
+    margin: auto;
+    margin-top: 20px;
+}
+
+
+
+.graph_card h6 {
+    margin: 0 7px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid #E7DFDD;
+}
+
+Hr {
+    margin: 5px;
+    color: "#E7DFDD"
+}
+
+/* dcc.RangeSlider {
+    background_color: "#123c69"
+} */

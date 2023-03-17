@@ -1,7 +1,7 @@
 import pandas as pd
 
 def get_data():
-    return pd.read_csv("C:/Users/20182667/Documents/Studie/Vakken/Master/Visual Analytics/visual-analytics-dashboard/data/MC1/SensorData.csv")
+    return pd.read_csv("data\MC1\SensorData.csv")
 
 def filter_data(data: pd.DataFrame, varlist):
     variables = ["car_type", "month"]

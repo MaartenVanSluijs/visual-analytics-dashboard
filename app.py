@@ -1,4 +1,8 @@
 from src.main import app
+from src.menu import generate_header, generate_control_card
+from data.MC1 import data_cleanup
+from data.MC1.data import get_data 
+
 from src.plots.MC1 import MC1
 from src.plots.entrance_plot import Entrance_plot
 
@@ -6,9 +10,10 @@ from dash import html, ctx, dcc
 from dash.dependencies import Input, Output
 
 
-
 if __name__ == '__main__':
-    mc1 = MC1("mc1")
+    df_mc1 = get_data()
+    # len_shortest_paths, shortest_paths = data_cleanup.shortest_paths()
+    mc1 = MC1("mc1", df_mc1)
     entrance = Entrance_plot("entrance")
 
     # Create the app
@@ -79,5 +84,13 @@ if __name__ == '__main__':
     )
     def update_entrance(car_type, month):
         return entrance.update(car_type, month, ctx.triggered_id)
+
+    @app.callback(
+        Output(mc1.html_id, "figure"), [
+        Input(mc1.html_id, "clickData")
+        ]
+    )
+    def update(click_data):
+        return mc1.update()
 
     app.run_server(debug=True, dev_tools_ui=True)

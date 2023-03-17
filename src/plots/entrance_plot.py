@@ -17,7 +17,6 @@ class Entrance_plot(html.Div):
         self.df = get_data()
 
     def update(self, car_type, month, triggered_id):
-        print(car_type, month)
 
         filtered_df = filter_data(self.df, [car_type, month])
 
