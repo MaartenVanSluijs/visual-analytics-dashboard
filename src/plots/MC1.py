@@ -18,7 +18,9 @@ class MC1(html.Div):
         self.data = self.get_data()
 
     def get_data(self):
-        print("Hello World!")
+        return
+        # print("Hello World!")
     
     def update(self):
-        print("Hello World!")
+        return
+        # print("Hello World!")
