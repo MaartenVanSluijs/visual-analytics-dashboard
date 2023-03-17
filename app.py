@@ -23,7 +23,7 @@ if __name__ == '__main__':
             # Left column
             html.Div(
                 id="left-column",
-                className="three columns",
+                className="four columns",
                 children=[
                     # Top graph
                     entrance,
@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
             html.Div(
                 id="center-column",
-                className="nine columns",
+                className="four columns",
                 children=[
                     dcc.Dropdown(
                         id="car_type",
