@@ -4,6 +4,7 @@ from data.MC1.data import get_data
 
 from src.plots.MC1 import MC1
 from src.plots.entrance_plot import Entrance_plot
+from src.plots.coefficient_plot import Coefficient_plot
 
 from dash import html, ctx, dcc
 from dash.dependencies import Input, Output
@@ -13,6 +14,7 @@ if __name__ == '__main__':
     # len_shortest_paths, shortest_paths = data_cleanup.shortest_paths()
     mc1 = MC1("mc1")
     entrance = Entrance_plot("entrance")
+    coefficient = Coefficient_plot("coefficient")
 
     # Create the app
     app.layout = html.Div(
@@ -26,9 +28,10 @@ if __name__ == '__main__':
                     # Top graph
                     entrance,
 
-                    html.Br()
+                    html.Br(),
 
                     # Bottom graph
+                    coefficient
                 ]
             ),
 
@@ -90,5 +93,11 @@ if __name__ == '__main__':
     )
     def update(click_data):
         return mc1.update()
+    
+    @app.callback(Output(coefficient.html_id, "figure"),
+                  Input(coefficient.html_id, "clickData")
+    )
+    def update(click_data):
+        return coefficient.update()
 
     app.run_server(debug=True, dev_tools_ui=True)
