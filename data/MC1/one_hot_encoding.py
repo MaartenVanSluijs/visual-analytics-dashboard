@@ -16,11 +16,11 @@ class OneHotEncoding():
         locations_dict = {}
         coordinates_dict = self.add_coordinates()
     
-        for index, location in enumerate(locations):
-            locations_dict[index] = [location, coordinates_dict[location]]
+        locations_dict['location'] = locations
+        locations_dict['coordinates'] = [coordinates_dict[location] for location in locations]
 
         df_locations = pd.DataFrame(locations_dict)
-        df_locations.to_csv("data\MC1\locations.csv", index=False)
+        df_locations.to_parquet("data\MC1\locations.parquet")
     
     def add_coordinates(self):
         img = mpimg.imread('data\MC1\Lekagul Roadways.bmp')
@@ -45,7 +45,7 @@ class OneHotEncoding():
                 if (coordinate[2]== color).all():
                     names.append(improved_locations[0])
                     improved_locations.pop(0)
-                    xy_coordinates.append((coordinate[0], coordinate[1]))
+                    xy_coordinates.append([coordinate[0], coordinate[1]])
 
         dict_coordinates = dict(zip(names, xy_coordinates))
         
