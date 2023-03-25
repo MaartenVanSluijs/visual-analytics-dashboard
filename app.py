@@ -21,19 +21,19 @@ if __name__ == '__main__':
         id="app-container",
         children=[
             # Left column
-            html.Div(
-                id="left-column",
-                className="four columns",
-                children=[
-                    # Top graph
-                    entrance,
+            # html.Div(
+            #     id="left-column",
+            #     className="four columns",
+            #     children=[
+            #         # Top graph
+            #         entrance,
 
-                    html.Br(),
+            #         html.Br(),
 
-                    # Bottom graph
-                    coefficient
-                ]
-            ),
+            #         # Bottom graph
+            #         coefficient
+            #     ]
+            # ),
 
             html.Div(
                 id="center-column",
@@ -78,13 +78,13 @@ if __name__ == '__main__':
         ],
     )
 
-    @app.callback(
-        Output(entrance.html_id, "figure"),
-        Input("car_type", "value"),
-        Input("month", "value")        
-    )
-    def update_entrance(car_type, month):
-        return entrance.update(car_type, month, ctx.triggered_id)
+    # @app.callback(
+    #     Output(entrance.html_id, "figure"),
+    #     Input("car_type", "value"),
+    #     Input("month", "value")        
+    # )
+    # def update_entrance(car_type, month):
+    #     return entrance.update(car_type, month, ctx.triggered_id)
 
     @app.callback(
         Output(mc1.html_id, "figure"), [
@@ -94,10 +94,10 @@ if __name__ == '__main__':
     def update(click_data):
         return mc1.update()
     
-    @app.callback(Output(coefficient.html_id, "figure"),
-                  Input(coefficient.html_id, "clickData")
-    )
-    def update(click_data):
-        return coefficient.update()
+    # @app.callback(Output(coefficient.html_id, "figure"),
+    #               Input(coefficient.html_id, "clickData")
+    # )
+    # def update(click_data):
+    #     return coefficient.update()
 
     app.run_server(debug=True, dev_tools_ui=True)

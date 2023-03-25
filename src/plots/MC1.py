@@ -4,7 +4,10 @@ import json
 import numpy as np
 import plotly.graph_objects as go
 from matplotlib import image, pyplot
+import  PIL.Image as Image
 from data.MC1.data import get_data
+import pandas as pd
+from data.MC1.train_model import model_trainer
 
 class MC1(html.Div):
     def __init__(self, name):
@@ -18,25 +21,26 @@ class MC1(html.Div):
             ],
         )
         
-        self.image = image.imread("data\MC1\Lekagul Roadways.bmp")
+        self.image = Image.open("data\MC1\Lekagul Roadways.bmp")
         self.df = get_data()
+        self.coordinates = pd.read_parquet("data\MC1\locations.parquet")['coordinates']
 
         self.fig = go.Figure()
 
-    def make_car_bubbles(self)->go.Figure:
-        img_width, img_height = self.map.size
+    def make_car_bubbles(self, coefficients)->go.Figure:
+    # get width and height of image PIL
+        img_width, img_height = self.image.size
         scale_factor = 3
-        heat_max = 100
 
-        df_data_scaled = self.df_data.copy()
-        df_data_scaled['x'] = df_data_scaled['x'] * scale_factor
-        df_data_scaled['y'] = df_data_scaled['y'] * scale_factor
+        coefficients = [abs(x) for x in coefficients]
 
-        fig = px.scatter(df_data_scaled.query("year==2007"), x="gdpPercap", y="lifeExp", size="pop", color="continent", hover_name="country", 
-                         log_x=True, size_max=60)
+        x_values = [x[0]*scale_factor for x in self.coordinates]
+        y_values = [x[1]*scale_factor for x in self.coordinates]
 
+        df_plot = pd.DataFrame({'x': x_values, 'y': y_values, 'size': coefficients})
 
-        # Configure axes
+        fig = px.scatter(df_plot, x='x', y='y', size='size')
+
         fig.update_xaxes(
             visible=False,
         )
@@ -57,7 +61,7 @@ class MC1(html.Div):
                 opacity=1.0,
                 layer="below",
                 sizing="stretch",
-                source=self.map)
+                source=self.image)
         )
 
         # Configure other layout
@@ -67,15 +71,12 @@ class MC1(html.Div):
             margin={"l": 0, "r": 0, "t": 0, "b": 0},
         )
 
-        fig.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 30
-        fig.layout.updatemenus[0].buttons[0].args[1]['transition']['duration'] = 5
-
         return fig
 
     def update(self):
         # self.fig.add_trace(go.Bar(self.df, x="car-type"))
         # print("Hello World!")
-
-        fig = self.make_car_bubbles()
+        trainer = model_trainer()
+        fig = self.make_car_bubbles(trainer.run_prediction())
 
         return fig

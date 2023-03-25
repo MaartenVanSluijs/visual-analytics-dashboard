@@ -3,7 +3,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
 class model_trainer():
-    def __init__(self, name):
+    def __init__(self):
         self.car_type = "2P"
 
         self.df = pd.read_csv("data\MC1\SensorDataProcessed.csv")
@@ -33,6 +33,3 @@ class model_trainer():
                                                   "6": is_car_type("6")}})
 
         return encoded_cars.sort_values(by="Timestamp")['car-type']
-
-trainer = model_trainer('test')
-print(len(trainer.run_prediction()))
