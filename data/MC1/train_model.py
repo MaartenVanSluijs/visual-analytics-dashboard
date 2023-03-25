@@ -4,15 +4,13 @@ from sklearn.model_selection import train_test_split
 
 class model_trainer():
     def __init__(self):
-        self.car_type = "2P"
-
         self.df = pd.read_csv("data\MC1\SensorDataProcessed.csv")
+        self.df_one_hot = pd.read_csv("data\MC1\one_hot_encoding.csv")
 
-    def run_prediction(self):
+    def run_prediction(self, car_type):
         # read df from csv
-        df_x = pd.read_csv("data\MC1\one_hot_encoding.csv")
-        y_values = self.get_y_values(self.car_type)
-        x_train, x_test, y_train, y_test = train_test_split(df_x, y_values, test_size=0.20, random_state=69)
+        y_values = self.get_y_values(car_type)
+        x_train, x_test, y_train, y_test = train_test_split(self.df_one_hot, y_values, test_size=0.20, random_state=69)
 
         logistic_model = LogisticRegression(random_state=0).fit(x_train, y_train)
         # return the coefficients of the model

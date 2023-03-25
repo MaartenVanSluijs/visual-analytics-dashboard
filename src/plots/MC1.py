@@ -23,7 +23,7 @@ class MC1(html.Div):
         
         self.image = Image.open("data\MC1\Lekagul Roadways.bmp")
         self.df = get_data()
-        self.coordinates = pd.read_parquet("data\MC1\locations.parquet")['coordinates']
+        self.locations = pd.read_parquet("data\MC1\locations.parquet")
 
         self.fig = go.Figure()
 
@@ -32,14 +32,16 @@ class MC1(html.Div):
         img_width, img_height = self.image.size
         scale_factor = 3
 
+        correlation = ["Positive" if x > 0 else "Negative" for x in coefficients]
+
         coefficients = [abs(x) for x in coefficients]
 
-        x_values = [x[0]*scale_factor for x in self.coordinates]
-        y_values = [x[1]*scale_factor for x in self.coordinates]
+        x_values = [x[0]*scale_factor for x in self.locations['coordinates']]
+        y_values = [x[1]*scale_factor for x in self.locations['coordinates']]
 
-        df_plot = pd.DataFrame({'x': x_values, 'y': y_values, 'size': coefficients})
+        df_plot = pd.DataFrame({'x': x_values, 'y': y_values, 'size': coefficients, 'name': self.locations['location'], 'correlation': correlation})
+        fig = px.scatter(df_plot, x='x', y='y', size='size', hover_name='name', color='correlation', color_discrete_map={'Positive': 'green', 'Negative': 'red'})
 
-        fig = px.scatter(df_plot, x='x', y='y', size='size')
 
         fig.update_xaxes(
             visible=False,
@@ -73,10 +75,10 @@ class MC1(html.Div):
 
         return fig
 
-    def update(self):
+    def update(self, car_type):
         # self.fig.add_trace(go.Bar(self.df, x="car-type"))
         # print("Hello World!")
         trainer = model_trainer()
-        fig = self.make_car_bubbles(trainer.run_prediction())
+        fig = self.make_car_bubbles(trainer.run_prediction(car_type))
 
         return fig

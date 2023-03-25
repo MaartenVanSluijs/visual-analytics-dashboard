@@ -88,11 +88,12 @@ if __name__ == '__main__':
 
     @app.callback(
         Output(mc1.html_id, "figure"), [
-        Input(mc1.html_id, "clickData")
+        Input(mc1.html_id, "clickData"),
+        Input("car_type", "value")
         ]
     )
-    def update(click_data):
-        return mc1.update()
+    def update(click_data, car_type):
+        return mc1.update(car_type)
     
     # @app.callback(Output(coefficient.html_id, "figure"),
     #               Input(coefficient.html_id, "clickData")
