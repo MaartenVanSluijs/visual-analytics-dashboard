@@ -37,7 +37,7 @@ class MC1(html.Div):
         coefficients = [abs(x) for x in coefficients]
 
         x_values = [x[0]*scale_factor for x in self.locations['coordinates']]
-        y_values = [x[1]*scale_factor for x in self.locations['coordinates']]
+        y_values = [(200-x[1])*scale_factor for x in self.locations['coordinates']]
 
         df_plot = pd.DataFrame({'x': x_values, 'y': y_values, 'size': coefficients, 'name': self.locations['location'], 'correlation': correlation})
         fig = px.scatter(df_plot, x='x', y='y', size='size', hover_name='name', color='correlation', color_discrete_map={'Positive': 'green', 'Negative': 'red'})
