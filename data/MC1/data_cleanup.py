@@ -149,7 +149,8 @@ def shortest_paths():
                 try: 
                     shortest_path = nx.shortest_path(graph, source, target)
                     extended_shortest_paths[source][target] = shortest_path
-                    shortest_paths[source][target] = len(shortest_path) - 1
+                    shortest_paths[source][target] = (len(shortest_path) - 1)*0.06
+
                 except nx.exception.NetworkXNoPath:
                     print("no path found")
                     continue
