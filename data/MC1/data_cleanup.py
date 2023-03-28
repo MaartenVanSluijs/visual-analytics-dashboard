@@ -59,13 +59,13 @@ def add_coordinates(df):
             if (coordinate[2]== color).all():
                 names.append(improved_locations[0])
                 improved_locations.pop(0)
-                xy_coordinates.append([coordinate[1], 200-coordinate[0]])
+                xy_coordinates.append([coordinate[1], coordinate[0]])
 
     dict_coordinates = dict(zip(names, xy_coordinates))
 
     for row, data in df.iterrows():
-        df.loc[row, 'y'] = dict_coordinates[data['gate-name']][0]
-        df.loc[row, 'x'] = dict_coordinates[data['gate-name']][1]
+        df.loc[row, 'x'] = dict_coordinates[data['gate-name']][0]
+        df.loc[row, 'y'] = dict_coordinates[data['gate-name']][1]
 
     return df
 
@@ -119,8 +119,7 @@ def shortest_paths():
                         # if neighbor is not a black pixel
                         if rbga_neighbor != (0, 0, 0, 255):
                             graph.add_edge((x, y), neighbor)
-    
-    print(graph)
+
     # Now we have a graph with all white and colored nodes 
 
     nodes_to_remove = []
@@ -136,8 +135,8 @@ def shortest_paths():
     for node, data in graph.nodes(data=True):
         if not (list(data.items())[0][1] == 255 and list(data.items())[1][1] == 255 and list(data.items())[2][1] == 255):
             colored_nodes.append(node)
-    
-    print(len(colored_nodes))
+
+    print(colored_nodes)
 
     shortest_paths = {}
     extended_shortest_paths = {}
@@ -154,9 +153,59 @@ def shortest_paths():
                 except nx.exception.NetworkXNoPath:
                     print("no path found")
                     continue
+
+    print(shortest_paths)
     
-    print(extended_shortest_paths)
     return shortest_paths, extended_shortest_paths
 
-process_data()
-# shortest_paths()
+def calculate_speed(df, shortest_path): 
+    #set timestamp to datetime
+    df["Timestamp"] = pd.to_datetime(df["Timestamp"])
+    print(df.dtypes)
+    # get all unique car ID's
+    car_ids = df["car-id"].unique()
+
+    # create empty dataframe
+    df_speed = pd.DataFrame(columns=['start', 'end', 'car-id', "car-type", "average-speed"])
+
+    for car_id in car_ids:
+        # Create dataset with only this car
+        car_df = df[df['car-id'] == car_id]
+
+        # Create a rolling window of 2
+        car_window = car_df.rolling(window=2)
+
+        # print(car_df.head(10))
+
+        for i, window_df in enumerate(car_window):
+        # skip the first row since it doesn't have a complete window
+            if i == 0:
+                continue
+            
+            begin = int(window_df["x"].iloc[0]), int(window_df["y"].iloc[0])
+            end = int(window_df["x"].iloc[1]), int(window_df["y"].iloc[1])
+
+            begin_time = window_df["Timestamp"].iloc[0]
+            end_time = window_df["Timestamp"].iloc[1]
+
+            id_car = window_df["car-id"].iloc[0]
+            type_car = window_df["car-type"].iloc[0]
+
+            if begin == end:
+                continue
+
+            distance = shortest_path[begin][end]
+            time_diff = (end_time - begin_time) / pd.Timedelta(hours=1)
+            average_speed = distance / time_diff
+            # print(begin, end, id_car, type_car, average_speed)
+
+            row = pd.DataFrame({'start': begin, 'end': end, 'car-id': id_car, "car-type": type_car, "average-speed": average_speed})
+            df_speed = pd.concat([df_speed, row], ignore_index=True)
+
+    df_speed.to_csv("data\MC1\speed.csv", index=False)
+    return df_speed
+
+df = process_data()
+shortest_path, _ = shortest_paths()
+speed = calculate_speed(df, shortest_path)
+print(speed)

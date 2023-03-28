@@ -1,6 +1,6 @@
 from src.main import app
 from src.menu import generate_header, generate_control_card
-from data.MC1.data import get_data 
+from data.MC1.data_cleanup import get_data 
 
 from src.plots.MC1 import MC1
 from src.plots.entrance_plot import Entrance_plot
