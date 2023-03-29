@@ -18,3 +18,28 @@ def filter_data(data: pd.DataFrame, varlist):
                                 (pd.to_datetime(data[variable]).dt.date <= pd.Timestamp(months[value[1]]).date())]
             
     return data
+
+def get_regression_data():
+    # Read in data
+    data = pd.read_csv("data\MC1\SensorDataProcessed.csv")
+    # Add date column
+    data["day"] = pd.to_datetime(data["Timestamp"]).dt.date
+    # Group based on this date
+    grouped_data = data.groupby("day", as_index=False).count().rename(columns={"Timestamp": "current_day"}).drop(["car-id", "car-type", "gate-name", "year-month", "x", "y"], axis=1)
+    
+    # Add history columns
+    for day in range(1,8):
+        grouped_data["day-"+str(day)] = grouped_data["current_day"].shift(day)
+
+    # Add weekend/weekday column
+    grouped_data["is_weekend"] = pd.to_datetime(grouped_data["day"]).dt.weekday > 4
+
+    # Add month column
+    grouped_data["month"] = pd.to_datetime(grouped_data["day"]).dt.month
+
+    # Store in CSV
+    # grouped_data.to_csv("data//MC1//regression_data.csv", index=False)
+    
+    return grouped_data
+
+get_regression_data()

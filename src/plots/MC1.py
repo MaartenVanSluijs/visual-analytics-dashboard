@@ -7,7 +7,6 @@ from matplotlib import image, pyplot
 import  PIL.Image as Image
 from data.MC1.data import get_data
 import pandas as pd
-from data.MC1.train_model import model_trainer
 
 class MC1(html.Div):
     def __init__(self, name):
