@@ -20,71 +20,50 @@ if __name__ == '__main__':
     app.layout = html.Div(
         id="app-container",
         children=[
-            # Left column
-            # html.Div(
-            #     id="left-column",
-            #     className="four columns",
-            #     children=[
-            #         # Top graph
-            #         entrance,
-
-            #         html.Br(),
-
-            #         # Bottom graph
-            #         coefficient
-            #     ]
-            # ),
-
             html.Div(
                 id="center-column",
                 className="four columns",
                 children=[
                     dcc.Dropdown(
                         id="car_type",
-                        options=[{"label": "two-axle car", "value": "1"}, 
-                                 {"label": "two-axle truck", "value": "2"}, 
-                                 {"label": "two-axle truck (park service)", "value": "2P"}, 
-                                 {"label": "three-axle truck", "value": "3"}, 
-                                 {"label": "four-axle (and above) truck", "value": "4"}, 
-                                 {"label": "two-axle bus", "value": "5"},
-                                 {"label": "three-axle bus", "value": "6"}],
+                        options=[{"label": "All cars", "value": "0"},
+                                 {"label": "Two-axle car", "value": "1"}, 
+                                 {"label": "Two-axle truck", "value": "2"}, 
+                                 {"label": "Two-axle truck (park service)", "value": "2P"}, 
+                                 {"label": "Three-axle truck", "value": "3"}, 
+                                 {"label": "Four-axle (and above) truck", "value": "4"}, 
+                                 {"label": "Two-axle bus", "value": "5"},
+                                 {"label": "Three-axle bus", "value": "6"}],
                         value= "1",
                         clearable=False
                     ),
                     dcc.RangeSlider(
                         id="month",
                         min=1,
-                        max=12,
+                        max=13,
                         step=None,
                         marks={
-                            1: 'January',
-                            2: 'February',
-                            3: 'March',
-                            4: 'April',
-                            5: 'May',
-                            6: 'June',
-                            7: 'July',
-                            8: 'August',
-                            9: 'September',
-                            10: 'October',
-                            11: 'November',
-                            12: 'December'                            
+                            1: "May 2015",
+                            2: 'June',
+                            3: 'July',
+                            4: 'August',
+                            5: 'September',
+                            6: 'October',
+                            7: 'November',
+                            8: 'December',
+                            9: 'January 2016',
+                            10: 'February',
+                            11: 'March',
+                            12: 'April',
+                            13: "May 2016"                         
                         },
-                        value=[1, 12]
+                        value=[1, 13]
                     ),
                     mc1
                 ]
             )
         ],
     )
-
-    # @app.callback(
-    #     Output(entrance.html_id, "figure"),
-    #     Input("car_type", "value"),
-    #     Input("month", "value")        
-    # )
-    # def update_entrance(car_type, month):
-    #     return entrance.update(car_type, month, ctx.triggered_id)
 
     @app.callback(
         Output(mc1.html_id, "figure"), [
@@ -94,11 +73,5 @@ if __name__ == '__main__':
     )
     def update(click_data, car_type):
         return mc1.update(car_type)
-    
-    # @app.callback(Output(coefficient.html_id, "figure"),
-    #               Input(coefficient.html_id, "clickData")
-    # )
-    # def update(click_data):
-    #     return coefficient.update()
 
     app.run_server(debug=True, dev_tools_ui=True)
