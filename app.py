@@ -60,7 +60,7 @@ if __name__ == '__main__':
                         },
                         value=[1, 13]
                     ),
-                    # regression,
+                    regression,
                     map
                 ]
             )
