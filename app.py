@@ -4,7 +4,7 @@ from data.MC1.data import get_data
 
 from src.plots.MC1 import MC1
 from src.plots.entrance_plot import Entrance_plot
-from src.plots.coefficient_plot import Coefficient_plot
+from src.plots.regression_plot import Regression_plot
 
 from dash import html, ctx, dcc
 from dash.dependencies import Input, Output
@@ -12,93 +12,67 @@ from dash.dependencies import Input, Output
 
 if __name__ == '__main__':
     # len_shortest_paths, shortest_paths = data_cleanup.shortest_paths()
-    mc1 = MC1("mc1")
     entrance = Entrance_plot("entrance")
-    coefficient = Coefficient_plot("coefficient")
+    regression = Regression_plot("regression")
+
 
     # Create the app
     app.layout = html.Div(
         id="app-container",
         children=[
-            # Left column
-            # html.Div(
-            #     id="left-column",
-            #     className="four columns",
-            #     children=[
-            #         # Top graph
-            #         entrance,
-
-            #         html.Br(),
-
-            #         # Bottom graph
-            #         coefficient
-            #     ]
-            # ),
-
             html.Div(
                 id="center-column",
-                className="four columns",
+                className="twelve columns",
                 children=[
                     dcc.Dropdown(
                         id="car_type",
-                        options=[{"label": "two-axle car", "value": "1"}, 
-                                 {"label": "two-axle truck", "value": "2"}, 
-                                 {"label": "two-axle truck (park service)", "value": "2P"}, 
-                                 {"label": "three-axle truck", "value": "3"}, 
-                                 {"label": "four-axle (and above) truck", "value": "4"}, 
-                                 {"label": "two-axle bus", "value": "5"},
-                                 {"label": "three-axle bus", "value": "6"}],
-                        value= "1",
+                        options=[{"label": "All cars", "value": "0"},
+                                 {"label": "Two-axle car", "value": "1"}, 
+                                 {"label": "Two-axle truck", "value": "2"}, 
+                                 {"label": "Two-axle truck (park service)", "value": "2P"}, 
+                                 {"label": "Three-axle truck", "value": "3"}, 
+                                 {"label": "Four-axle (and above) truck", "value": "4"}, 
+                                 {"label": "Two-axle bus", "value": "5"},
+                                 {"label": "Three-axle bus", "value": "6"}],
+                        value= "0",
                         clearable=False
                     ),
                     dcc.RangeSlider(
                         id="month",
                         min=1,
-                        max=12,
+                        max=13,
                         step=None,
                         marks={
-                            1: 'January',
-                            2: 'February',
-                            3: 'March',
-                            4: 'April',
-                            5: 'May',
-                            6: 'June',
-                            7: 'July',
-                            8: 'August',
-                            9: 'September',
-                            10: 'October',
-                            11: 'November',
-                            12: 'December'                            
+                            1: "May 2015",
+                            2: 'June',
+                            3: 'July',
+                            4: 'August',
+                            5: 'September',
+                            6: 'October',
+                            7: 'November',
+                            8: 'December',
+                            9: 'January 2016',
+                            10: 'February',
+                            11: 'March',
+                            12: 'April',
+                            13: "May 2016"                         
                         },
-                        value=[1, 12]
+                        value=[1, 13]
                     ),
-                    mc1
+                    regression
                 ]
             )
         ],
     )
 
-    # @app.callback(
-    #     Output(entrance.html_id, "figure"),
-    #     Input("car_type", "value"),
-    #     Input("month", "value")        
-    # )
-    # def update_entrance(car_type, month):
-    #     return entrance.update(car_type, month, ctx.triggered_id)
-
+    # Callback for the regression plot
     @app.callback(
-        Output(mc1.html_id, "figure"), [
-        Input(mc1.html_id, "clickData"),
-        Input("car_type", "value")
+        Output(regression.html_id, "figure"), [
+        Input("car_type", "value"),
+        Input("month", "value")
         ]
     )
-    def update(click_data, car_type):
-        return mc1.update(car_type)
-    
-    # @app.callback(Output(coefficient.html_id, "figure"),
-    #               Input(coefficient.html_id, "clickData")
-    # )
-    # def update(click_data):
-    #     return coefficient.update()
+    def update(car_type, month):
+        return regression.update(car_type, month)
 
     app.run_server(debug=True, dev_tools_ui=True)
