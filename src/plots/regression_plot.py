@@ -4,7 +4,7 @@ import pandas as pd
 from dash import dcc, html
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import train_test_split
-import plotly_express as px
+import plotly.graph_objects as go
 
 class Regression_plot(html.Div):
     def __init__(self, name):
@@ -20,17 +20,31 @@ class Regression_plot(html.Div):
 
         self.df = pd.read_csv("data//MC1//regression_data.csv")
 
-    def update(self):
-        test_data = self.run_regression(self.df).sort_values(by="day")
+    def update(self, car_type, month):
+        # print(car_type, month)
+        filtered_df = get_regression_data(car_type, month)
 
-        fig = px.line(test_data, x="day", y="predicted_value", title='Predicted amount of cars in the park per day')
+        if filtered_df.empty:
+            print("This dataframe is empty")
+
+        test_data = self.run_regression(filtered_df).sort_values(by="day")
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=test_data["day"], y=test_data["predicted_value"],
+                            mode='lines',
+                            name='Predicted number of cars'))
+        fig.add_trace(go.Scatter(x=test_data["day"], y=test_data["current_day"],
+                            mode='lines',
+                            name='Actual number of cars'))
+        
+        fig.update_layout(title="Predicted and actual amount of cars",
+                          autosize=False,
+                          width= 1200,
+                          )
 
         return fig
     
     def run_regression(self, df) -> pd.DataFrame:
-        X_values = pd.DataFrame(df[["day", "day-1", "day-2", "day-3", "day-4", "day-5", "day-6", "day-7", "is_weekend", "month"]])
-        y_values = pd.DataFrame(df["current_day"])
-
         df_train, df_test = train_test_split(df, test_size=0.8, random_state=69)
 
         X_train = df_train[["day-1", "day-2", "day-3", "day-4", "day-5", "day-6", "day-7", "is_weekend", "month"]]

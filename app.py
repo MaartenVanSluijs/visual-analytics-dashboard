@@ -22,7 +22,7 @@ if __name__ == '__main__':
         children=[
             html.Div(
                 id="center-column",
-                className="four columns",
+                className="twelve columns",
                 children=[
                     dcc.Dropdown(
                         id="car_type",
@@ -34,7 +34,7 @@ if __name__ == '__main__':
                                  {"label": "Four-axle (and above) truck", "value": "4"}, 
                                  {"label": "Two-axle bus", "value": "5"},
                                  {"label": "Three-axle bus", "value": "6"}],
-                        value= "1",
+                        value= "0",
                         clearable=False
                     ),
                     dcc.RangeSlider(
@@ -68,10 +68,11 @@ if __name__ == '__main__':
     # Callback for the regression plot
     @app.callback(
         Output(regression.html_id, "figure"), [
-        Input(regression.html_id, "clickData")
+        Input("car_type", "value"),
+        Input("month", "value")
         ]
     )
-    def update(click_data):
-        return regression.update()
+    def update(car_type, month):
+        return regression.update(car_type, month)
 
     app.run_server(debug=True, dev_tools_ui=True)
