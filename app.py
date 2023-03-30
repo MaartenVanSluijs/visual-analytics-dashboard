@@ -70,11 +70,12 @@ if __name__ == '__main__':
     # Callback for the map plot
     @app.callback(
         Output(map.html_id, "figure"), [
-        Input(map.html_id, "clickData")
+        Input("car_type", "value"),
+        Input("month", "value")
         ]
     )
-    def update_map(click_data):
-        return map.update(click_data)
+    def update_map(car_type, month):
+        return map.update(car_type, month)
 
     # Callback for the regression plot
     @app.callback(

@@ -13,7 +13,8 @@ def filter_data(data: pd.DataFrame, varlist):
             variable = variables[index]
         
             if variable == "car_type":
-                data = data.loc[data["car-type"] == value]
+                if value != "0":
+                    data = data.loc[data["car-type"] == value]
             elif variable == "year-month":
                 data = data.loc[(pd.to_datetime(data[variable]).dt.date >= pd.Timestamp(months[value[0]]).date()) & 
                                 (pd.to_datetime(data[variable]).dt.date <= pd.Timestamp(months[value[1]]).date())]

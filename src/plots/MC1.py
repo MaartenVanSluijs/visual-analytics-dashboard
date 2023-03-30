@@ -5,7 +5,7 @@ import numpy as np
 import plotly.graph_objects as go
 from matplotlib import image, pyplot
 import  PIL.Image as Image
-from data.MC1.data import get_data
+from data.MC1.data import get_data, filter_data
 import pandas as pd
 
 class MC1(html.Div):
@@ -21,29 +21,54 @@ class MC1(html.Div):
         )
         
         self.image = Image.open("data\MC1\Lekagul Roadways.bmp")
+
+        # Get data and add a day column for identifying the amount of days in the df
         self.df = get_data()
         self.df["day"] = pd.to_datetime(self.df["Timestamp"]).dt.date
+        
         self.locations = pd.read_parquet("data\MC1\locations.parquet").sort_values(by="location")
+        # Colour codings per gate type
         self.colours = {"camping": "#FF6A00", "entrance": "#4CFF00", "gate": "#FF0000", "general-gate": "#00FFFF", "ranger-bas": "#FF00DC", "ranger-stop": "#FFD800"}
 
         self.fig = go.Figure()
     
-    def update(self, click_data):
+    def update(self, car_type, month):
 
-        number_of_days = len(self.df.groupby("day", as_index=False).count().index)
+        # Filter the data on car_type and month
+        filtered_df = filter_data(self.df, [car_type, month])
+        if filtered_df.empty:
+            print("This dataframe is empty")
 
-        gate_count = self.df.groupby("gate-name").count().rename(columns={"Timestamp": "count"}).drop(["car-id", "car-type", "year-month", "x", "y"], axis=1)
-        gate_count["avg_count"] = gate_count["count"].div(number_of_days).round(2)
+        # Get the number of days in the selected data
+        number_of_days = len(filtered_df.groupby("day", as_index=False).count().index)
+
+        # Initialize a zeros df per location, to be filled later with the counts
+        count_by_location = pd.DataFrame({"gate-name": self.locations["location"], "count": np.zeros((40))})
+        count_by_location.set_index("gate-name", inplace=True)
+
+        # Group the filtered data by gate name to get counts per gate
+        gate_count = filtered_df.groupby("gate-name").count().rename(columns={"Timestamp": "count"}).drop(["car-id", "car-type", "year-month", "x", "y", "day"], axis=1)
+
+        # Loop through all the gates
+        for index, row in gate_count.iterrows():
+            # Set the right count for each location
+            count_by_location.at[index, "count"] = row["count"]
+    
+        # Compute the average count for each gate
+        count_by_location["avg_count"] = count_by_location["count"].div(number_of_days).round(2)
         # get width and height of image PIL
         img_width, img_height = self.image.size
         scale_factor = 3
 
+        # Create the columns for x, y, and location values
         x_values = [x[0]*scale_factor for x in self.locations['coordinates']]
         y_values = [(200-x[1])*scale_factor for x in self.locations['coordinates']]
         location_type = [location[:-1] for location in self.locations["location"]]
 
-        df_plot = pd.DataFrame({"x": x_values, "y": y_values, "location_type": location_type, "size": gate_count["avg_count"]})
+        # Construct the dataframe
+        df_plot = pd.DataFrame({"x": x_values, "y": y_values, "location_type": location_type, "size": count_by_location["avg_count"]})
         
+        # Make the scatter to be overlayed on the image
         fig = px.scatter(df_plot, x='x', y='y', size='size', color="location_type", color_discrete_map=self.colours) 
 
 
