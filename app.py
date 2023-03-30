@@ -14,6 +14,7 @@ if __name__ == '__main__':
     # len_shortest_paths, shortest_paths = data_cleanup.shortest_paths()
     entrance = Entrance_plot("entrance")
     regression = Regression_plot("regression")
+    map = MC1("map")
 
 
     # Create the app
@@ -59,11 +60,21 @@ if __name__ == '__main__':
                         },
                         value=[1, 13]
                     ),
-                    regression
+                    # regression,
+                    map
                 ]
             )
         ],
     )
+
+    # Callback for the map plot
+    @app.callback(
+        Output(map.html_id, "figure"), [
+        Input(map.html_id, "clickData")
+        ]
+    )
+    def update_map(click_data):
+        return map.update(click_data)
 
     # Callback for the regression plot
     @app.callback(
@@ -72,7 +83,7 @@ if __name__ == '__main__':
         Input("month", "value")
         ]
     )
-    def update(car_type, month):
+    def update_regression(car_type, month):
         return regression.update(car_type, month)
 
     app.run_server(debug=True, dev_tools_ui=True)

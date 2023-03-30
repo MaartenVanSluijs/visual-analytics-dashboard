@@ -22,24 +22,29 @@ class MC1(html.Div):
         
         self.image = Image.open("data\MC1\Lekagul Roadways.bmp")
         self.df = get_data()
-        self.locations = pd.read_parquet("data\MC1\locations.parquet")
+        self.df["day"] = pd.to_datetime(self.df["Timestamp"]).dt.date
+        self.locations = pd.read_parquet("data\MC1\locations.parquet").sort_values(by="location")
+        self.colours = {"camping": "#FF6A00", "entrance": "#4CFF00", "gate": "#FF0000", "general-gate": "#00FFFF", "ranger-bas": "#FF00DC", "ranger-stop": "#FFD800"}
 
         self.fig = go.Figure()
+    
+    def update(self, click_data):
 
-    def make_car_bubbles(self, coefficients)->go.Figure:
-    # get width and height of image PIL
+        number_of_days = len(self.df.groupby("day", as_index=False).count().index)
+
+        gate_count = self.df.groupby("gate-name").count().rename(columns={"Timestamp": "count"}).drop(["car-id", "car-type", "year-month", "x", "y"], axis=1)
+        gate_count["avg_count"] = gate_count["count"].div(number_of_days).round(2)
+        # get width and height of image PIL
         img_width, img_height = self.image.size
         scale_factor = 3
 
-        correlation = ["Positive" if x > 0 else "Negative" for x in coefficients]
-
-        coefficients = [abs(x) for x in coefficients]
-
         x_values = [x[0]*scale_factor for x in self.locations['coordinates']]
         y_values = [(200-x[1])*scale_factor for x in self.locations['coordinates']]
+        location_type = [location[:-1] for location in self.locations["location"]]
 
-        df_plot = pd.DataFrame({'x': x_values, 'y': y_values, 'size': coefficients, 'name': self.locations['location'], 'correlation': correlation})
-        fig = px.scatter(df_plot, x='x', y='y', size='size', hover_name='name', color='correlation', color_discrete_map={'Positive': 'green', 'Negative': 'red'})
+        df_plot = pd.DataFrame({"x": x_values, "y": y_values, "location_type": location_type, "size": gate_count["avg_count"]})
+        
+        fig = px.scatter(df_plot, x='x', y='y', size='size', color="location_type", color_discrete_map=self.colours) 
 
 
         fig.update_xaxes(
@@ -71,13 +76,5 @@ class MC1(html.Div):
             height=img_height * scale_factor,
             margin={"l": 0, "r": 0, "t": 0, "b": 0},
         )
-
-        return fig
-
-    def update(self, car_type):
-        # self.fig.add_trace(go.Bar(self.df, x="car-type"))
-        # print("Hello World!")
-        trainer = model_trainer()
-        fig = self.make_car_bubbles(trainer.run_prediction(car_type))
 
         return fig
