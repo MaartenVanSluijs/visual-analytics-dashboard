@@ -3,12 +3,12 @@ from dash import dcc, html
 import plotly.express as px
 from PIL import Image
 import networkx as nx
+import numpy as np
 import matplotlib.image as mpimg
 
 def process_data():
     # Read in the data
     df = pd.read_csv("data\MC1\SensorData.csv")
-    print(df.head())
 
     # Set the timestamp to datetime format
     df["Timestamp"] = pd.to_datetime(df["Timestamp"])
@@ -17,8 +17,8 @@ def process_data():
     df.dropna
 
     # Check if there are weird values (typos) in the columns
-    print(df['car-type'].value_counts())
-    print(df["gate-name"].value_counts())
+    # print(df['car-type'].value_counts())
+    # print(df["gate-name"].value_counts())
     # There are no weird values in the columns
 
     # Check if there are gaps in the data
@@ -32,7 +32,10 @@ def process_data():
 
     df.to_csv("data\MC1\SensorDataProcessed.csv", index=False)
 
-    return df
+    shortest_path, _ = shortest_paths()
+    df_speed = calculate_speed(df, shortest_path)  
+
+    return df, df_speed
 
 def add_coordinates(df):
     img = mpimg.imread('data\MC1\Lekagul Roadways.bmp')
@@ -136,7 +139,7 @@ def shortest_paths():
         if not (list(data.items())[0][1] == 255 and list(data.items())[1][1] == 255 and list(data.items())[2][1] == 255):
             colored_nodes.append(node)
 
-    print(colored_nodes)
+    # print(colored_nodes)
 
     shortest_paths = {}
     extended_shortest_paths = {}
@@ -154,19 +157,18 @@ def shortest_paths():
                     print("no path found")
                     continue
 
-    print(shortest_paths)
+    # print(shortest_paths)
     
     return shortest_paths, extended_shortest_paths
 
 def calculate_speed(df, shortest_path): 
     #set timestamp to datetime
     df["Timestamp"] = pd.to_datetime(df["Timestamp"])
-    print(df.dtypes)
     # get all unique car ID's
     car_ids = df["car-id"].unique()
 
     # create empty dataframe
-    df_speed = pd.DataFrame(columns=['start', 'end', 'car-id', "car-type", "average-speed"])
+    df_speed = pd.DataFrame(columns=['start-x', 'start-y', 'end-x', 'end-y', 'start-time', 'end-time', 'car-id', 'car-type', 'average-speed'])
 
     for car_id in car_ids:
         # Create dataset with only this car
@@ -199,13 +201,14 @@ def calculate_speed(df, shortest_path):
             average_speed = distance / time_diff
             # print(begin, end, id_car, type_car, average_speed)
 
-            row = pd.DataFrame({'start': begin, 'end': end, 'car-id': id_car, "car-type": type_car, "average-speed": average_speed})
-            df_speed = pd.concat([df_speed, row], ignore_index=True)
+            # print(begin, begin[0], begin[1])
+
+            row = pd.DataFrame({'start-x': begin[0], 'start-y': begin[1], 'end-x': end[0], 'end-y': end[1], 'start-time': begin_time, 
+                                'end-time': end_time, 'car-id': id_car, "car-type": type_car, "average-speed": average_speed}, index=[0])
+        df_speed = pd.concat([df_speed, row], ignore_index=True)
 
     df_speed.to_csv("data\MC1\speed.csv", index=False)
     return df_speed
 
-df = process_data()
-shortest_path, _ = shortest_paths()
-speed = calculate_speed(df, shortest_path)
-print(speed)
+database, speed = process_data()
+print(speed.head())

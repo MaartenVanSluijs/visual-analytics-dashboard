@@ -1,18 +1,25 @@
 from src.main import app
 from src.menu import generate_header, generate_control_card
-from data.MC1.data_cleanup import get_data 
+from data.MC1.data_cleanup import process_data
 
 from src.plots.MC1 import MC1
 from src.plots.entrance_plot import Entrance_plot
 from src.plots.coefficient_plot import Coefficient_plot
+from src.plots.speed_bar_plot import SpeedBar
 
 from dash import html, ctx, dcc
 from dash.dependencies import Input, Output
+import pandas as pd
 
 
 if __name__ == '__main__':
-    # len_shortest_paths, shortest_paths = data_cleanup.shortest_paths()
+    # read in data 
+    original_df = pd.read_csv("data\MC1\SensorData.csv")
+    df_speed = pd.read_csv("data\MC1\speed.csv")
+
+    # Create instances for visualizations
     mc1 = MC1("mc1")
+    speedbar = SpeedBar("speedbar", df_speed)
     entrance = Entrance_plot("entrance")
     coefficient = Coefficient_plot("coefficient")
 
@@ -20,62 +27,31 @@ if __name__ == '__main__':
     app.layout = html.Div(
         id="app-container",
         children=[
+            html.Header(
+                id="header",
+                className="twelve columns", 
+                children=generate_header()
+            ),
+
             # Left column
-            # html.Div(
-            #     id="left-column",
-            #     className="four columns",
-            #     children=[
-            #         # Top graph
-            #         entrance,
-
-            #         html.Br(),
-
-            #         # Bottom graph
-            #         coefficient
-            #     ]
-            # ),
-
             html.Div(
-                id="center-column",
-                className="four columns",
+                id="left-column",
+                className="seven columns",
                 children=[
-                    dcc.Dropdown(
-                        id="car_type",
-                        options=[{"label": "two-axle car", "value": "1"}, 
-                                 {"label": "two-axle truck", "value": "2"}, 
-                                 {"label": "two-axle truck (park service)", "value": "2P"}, 
-                                 {"label": "three-axle truck", "value": "3"}, 
-                                 {"label": "four-axle (and above) truck", "value": "4"}, 
-                                 {"label": "two-axle bus", "value": "5"},
-                                 {"label": "three-axle bus", "value": "6"}],
-                        value= "1",
-                        clearable=False
-                    ),
-                    dcc.RangeSlider(
-                        id="month",
-                        min=1,
-                        max=12,
-                        step=None,
-                        marks={
-                            1: 'January',
-                            2: 'February',
-                            3: 'March',
-                            4: 'April',
-                            5: 'May',
-                            6: 'June',
-                            7: 'July',
-                            8: 'August',
-                            9: 'September',
-                            10: 'October',
-                            11: 'November',
-                            12: 'December'                            
-                        },
-                        value=[1, 12]
-                    ),
                     mc1
                 ]
-            )
-        ],
+            ),
+
+            # Right column
+            html.Div(
+                id="right-column",
+                className="five columns",
+                children=[
+                    generate_control_card(original_df),
+                    speedbar
+                ]
+            ),
+        ]
     )
 
     # @app.callback(
@@ -101,4 +77,13 @@ if __name__ == '__main__':
     # def update(click_data):
     #     return coefficient.update()
 
+    @app.callback(
+        Output(speedbar.html_id, "figure"), 
+        Input("car_type", "value"), 
+        Input(mc1.html_id, "clickData"),
+    )
+    def update(car_type, click_data):
+        return speedbar.update(car_type)
+
+    
     app.run_server(debug=True, dev_tools_ui=True)
