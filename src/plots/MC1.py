@@ -32,8 +32,11 @@ class MC1(html.Div):
 
         self.fig = go.Figure()
     
-    def update(self, car_type, month):
 
+    def make_car_bubbles(self, coefficients)->go.Figure:
+    # get width and height of image PIL
+        img_width, img_height = self.image.size
+        scale_factor = 4
         # Filter the data on car_type and month
         filtered_df = filter_data(self.df, [car_type, month])
         if filtered_df.empty:
@@ -102,5 +105,11 @@ class MC1(html.Div):
             margin={"l": 0, "r": 0, "t": 0, "b": 0},
             clickmode="select+event"
         )
+
+        return fig
+
+    def update(self, car_type):
+        trainer = model_trainer()
+        fig = self.make_car_bubbles(trainer.run_prediction(car_type))
 
         return fig
