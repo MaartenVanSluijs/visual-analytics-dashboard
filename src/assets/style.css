@@ -1,27 +1,27 @@
 body {
-    background-color: #0E0B16;
-    color: #E7DFDD;
+    background-color: #E7DFDD;
+    color: #000;
     font-family: "Helvetica Neue", Arial, sans-serif;
     font-size: 15px;
     margin: 0px;
 }
 
 #left-column {
-    padding: 20px 2rem;
+    padding: 5px;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
 #right-column {
-    background-color: #0E0B16;
-    padding: 0rem 2rem;
+    background-color: #E7DFDD;
+    padding: 0rem;
     min-height: 100vh;
     margin-left: 10px;
 }
 
 h5 {
-    color: #E7DFDD;
+    color: #000;
     font-weight: 300;
 }
 
@@ -41,13 +41,13 @@ h1 {
 }
 
 #control-card {
-    background-color: #0E0B16;
+    background-color: #E7DFDD;
     border-radius: 0.675rem;
     padding: 1rem;
 }
 
 .graph_card {
-    background-color: #0E0B16;
+    background-color: #E7DFDD;
     border-radius: 0.675rem;
     padding: 1rem;
     margin: auto;
@@ -64,7 +64,11 @@ h1 {
 
 Hr {
     margin: 5px;
-    color: "#E7DFDD"
+    color: "#000"
+}
+
+.plot-container.plotly {
+    background-color: #E7DFDD;
 }
 
 /* dcc.RangeSlider {

@@ -32,9 +32,38 @@ def generate_control_card(df):
             html.Label("Car Type",  style={"font-weight": "bold"}),
             html.Hr(),
             dcc.Dropdown(
-                id="map_var",
-                options=df["car-type"],
-                value="price"
+                id="car_type",
+                options=[{"label": "two-axle car", "value": "1"}, 
+                            {"label": "two-axle truck", "value": "2"}, 
+                            {"label": "two-axle truck (park service)", "value": "2P"}, 
+                            {"label": "three-axle truck", "value": "3"}, 
+                            {"label": "four-axle (and above) truck", "value": "4"}, 
+                            {"label": "two-axle bus", "value": "5"},
+                            {"label": "three-axle bus", "value": "6"}],
+                value= "1",
+                clearable=False
+            ),
+            html.Hr(),
+            dcc.RangeSlider(
+                id="month",
+                min=1,
+                max=12,
+                step=None,
+                marks={
+                    1: 'January',
+                    2: 'February',
+                    3: 'March',
+                    4: 'April',
+                    5: 'May',
+                    6: 'June',
+                    7: 'July',
+                    8: 'August',
+                    9: 'September',
+                    10: 'October',
+                    11: 'November',
+                    12: 'December'                            
+                },
+                value=[1, 12]
             ),
         ],
     )
