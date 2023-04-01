@@ -102,7 +102,7 @@ class MC1(html.Div):
             width=img_width * scale_factor,
             height=img_height * scale_factor,
             margin={"l": 0, "r": 0, "t": 0, "b": 0},
-            clickmode="select+event"
+            clickmode="event"
         )
 
         fig.update_traces(hoverinfo="none", hovertemplate=None)
