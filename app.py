@@ -83,7 +83,11 @@ if __name__ == '__main__':
         Input(mc1.html_id, "clickData"),
     )
     def update(car_type, click_data):
-        return speedbar.update(car_type)
+        print(click_data)
+        if click_data is not None and len(click_data["points"]) >= 2: 
+            start_node = click_data["points"][0]["x"], click_data["points"][0]["y"]
+            end_node = click_data["points"][1]["x"], click_data["points"][1]["y"]
+            return speedbar.update(car_type, start_node, end_node)
 
     
     app.run_server(debug=True, dev_tools_ui=True)

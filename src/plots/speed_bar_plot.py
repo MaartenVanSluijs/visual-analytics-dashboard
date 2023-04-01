@@ -16,13 +16,18 @@ class SpeedBar(html.Div):
         )
 
     def update(self, car_type, start_node, end_node):
+        print("Hello")
         self.fig = go.Figure()
 
         # Filter dataset on specific path
+        print(start_node, end_node)
         df = self.df
         df_filtered = df.loc[(df["start-x"] == start_node[0]) & (df["start-y"] == start_node[1]) & (df["end-x"] == end_node[0]) & (df["end-y"] == end_node[1])]
         print(df_filtered.head())
 
+        # Now we have a dataset that shows the average speed per car type for a specific road 
+
+        # TODO: for each hour, we want the averages of all speeds 
         
         avg_speeds = self.df.groupby('car-type')['average-speed'].mean().reset_index()
         print(avg_speeds)

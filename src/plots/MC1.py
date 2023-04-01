@@ -30,7 +30,7 @@ class MC1(html.Div):
     def make_car_bubbles(self, coefficients)->go.Figure:
     # get width and height of image PIL
         img_width, img_height = self.image.size
-        scale_factor = 3
+        scale_factor = 4
 
         correlation = ["Positive" if x > 0 else "Negative" for x in coefficients]
 
@@ -76,8 +76,6 @@ class MC1(html.Div):
         return fig
 
     def update(self, car_type):
-        # self.fig.add_trace(go.Bar(self.df, x="car-type"))
-        # print("Hello World!")
         trainer = model_trainer()
         fig = self.make_car_bubbles(trainer.run_prediction(car_type))
 

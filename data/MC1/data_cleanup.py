@@ -210,5 +210,3 @@ def calculate_speed(df, shortest_path):
     df_speed.to_csv("data\MC1\speed.csv", index=False)
     return df_speed
 
-database, speed = process_data()
-print(speed.head())
