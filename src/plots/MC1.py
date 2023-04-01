@@ -16,7 +16,7 @@ class MC1(html.Div):
         super().__init__(
             className="graph_card",
             children=[
-                dcc.Graph(id=self.html_id)
+                dcc.Graph(id=self.html_id, clear_on_unhover=True)
             ],
         )
         
@@ -105,6 +105,8 @@ class MC1(html.Div):
             margin={"l": 0, "r": 0, "t": 0, "b": 0},
             clickmode="select+event"
         )
+
+        fig.update_traces(hoverinfo="none", hovertemplate=None)
 
         return fig
 

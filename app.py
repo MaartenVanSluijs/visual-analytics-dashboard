@@ -7,10 +7,12 @@ from src.plots.entrance_plot import Entrance_plot
 from src.plots.coefficient_plot import Coefficient_plot
 from src.plots.speed_bar_plot import SpeedBar
 from src.plots.regression_plot import Regression_plot
+from src.plots.hover_plot import Hover_plot
 
 
 from dash import html, ctx, dcc
-from dash.dependencies import Input, Output
+from dash.exceptions import PreventUpdate
+from dash.dependencies import Input, Output, State
 import pandas as pd
 
 
@@ -27,7 +29,7 @@ if __name__ == '__main__':
     entrance = Entrance_plot("entrance")
     regression = Regression_plot("regression")
     map = MC1("map")
-
+    hover = Hover_plot("hover")
 
     # Create the app
     app.layout = html.Div(
@@ -71,6 +73,30 @@ if __name__ == '__main__':
     )
     def update_map(car_type, month):
         return map.update(car_type, month)
+    
+    @app.callback(
+    Output("graph-tooltip", "show"),
+    Output("graph-tooltip", "bbox"),
+    Output("graph-tooltip", "children"),
+    Input(map.html_id, "hoverData"),
+    State("month", "value")
+    )
+    def display_hover(hover_data, month):
+        if hover_data is None:
+            return False, None, None
+        
+        pt = hover_data["points"][0]
+        bbox = pt["bbox"]
+        x = pt["x"]
+        y = pt["y"]
+
+        point = [x,y]
+        
+        children = [
+            dcc.Graph(figure=hover.get_plot(point, month))
+        ]
+
+        return True, bbox, children
 
     # Callback for the regression plot
     @app.callback(
