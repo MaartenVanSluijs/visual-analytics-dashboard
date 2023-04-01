@@ -40,6 +40,7 @@ class Regression_plot(html.Div):
         fig.update_layout(title="Predicted and actual amount of cars",
                           autosize=False,
                           width= 1200,
+                          hovermode="x unified"
                           )
 
         return fig
