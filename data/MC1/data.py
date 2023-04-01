@@ -2,6 +2,8 @@ import pandas as pd
 from typing import List
 
 months = {1: "2015-05", 2: "2015-06", 3: "2015-07", 4: "2015-08", 5: "2015-09", 6: "2015-10", 7: "2015-11", 8: "2015-12", 9: "2016-01", 10: "2016-02", 11: "2016-03", 12: "2016-04", 13: "2016-05", 14: "2016-06"}
+locations = pd.read_parquet("data\MC1\locations.parquet")
+df_speed = pd.read_csv("..\..\data\MC1\speed.csv")
 
 def get_data():
     return pd.read_csv("data\MC1\SensorDataProcessed.csv")
@@ -26,10 +28,8 @@ def filter_data(data: pd.DataFrame, varlist):
     return data
 
 def get_car_id_path(selected_locations: List(str))->List(str):
-    locations = pd.read_parquet("data\MC1\locations.parquet")
-    df_speed = pd.read_csv("..\..\data\MC1\speed.csv")
     coordinates = []
-    for i in locations:
+    for i in selected_locations:
         coordinates.append(locations.loc[locations['location'] == i, 'coordinates'].values[0])
 
     speed_filtered = df_speed.loc[((df_speed["start-x"] == coordinates[0][0]) & (df_speed["start-y"] == coordinates[0][1]) &
