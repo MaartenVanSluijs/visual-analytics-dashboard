@@ -4,7 +4,6 @@ from data.MC1.data_cleanup import process_data
 
 from src.plots.MC1 import MC1
 from src.plots.entrance_plot import Entrance_plot
-from src.plots.coefficient_plot import Coefficient_plot
 from src.plots.speed_bar_plot import SpeedBar
 from src.plots.regression_plot import Regression_plot
 from src.plots.hover_plot import Hover_plot
@@ -23,7 +22,7 @@ if __name__ == '__main__':
     df_speed = pd.read_csv("data\MC1\speed.csv")
 
     # Create instances for visualizations
-    mc1 = MC1("mc1")
+    map = MC1("mc1")
     speedbar = SpeedBar("speedbar", df_speed)
 
     entrance = Entrance_plot("entrance")
@@ -46,8 +45,9 @@ if __name__ == '__main__':
                 id="left-column",
                 className="seven columns",
                 children=[
-                    mc1
-
+                    html.H3(children="Hallo"),
+                    map,
+                    regression
                 ]
             ),
 
@@ -58,7 +58,7 @@ if __name__ == '__main__':
                 children=[
                     generate_control_card(original_df),
                     speedbar,
-                    regression
+                    dcc.Tooltip(id="graph-tooltip")
                 ]
             ),
         ]
@@ -72,8 +72,10 @@ if __name__ == '__main__':
         ]
     )
     def update_map(car_type, month):
+        print(car_type, month)
         return map.update(car_type, month)
     
+    # Callback for the hover plot
     @app.callback(
     Output("graph-tooltip", "show"),
     Output("graph-tooltip", "bbox"),
@@ -108,13 +110,13 @@ if __name__ == '__main__':
     def update_regression(car_type, month):
         return regression.update(car_type, month)
 
+    # Callback for the speed plot
     @app.callback(
         Output(speedbar.html_id, "figure"), 
         Input("car_type", "value"), 
-        Input(mc1.html_id, "clickData"),
+        Input(map.html_id, "clickData"),
     )
     def update(car_type, click_data):
-        print(click_data)
         if click_data is not None and len(click_data["points"]) >= 2: 
             start_node = click_data["points"][0]["x"], click_data["points"][0]["y"]
             end_node = click_data["points"][1]["x"], click_data["points"][1]["y"]

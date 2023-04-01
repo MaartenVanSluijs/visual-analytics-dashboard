@@ -33,10 +33,12 @@ class MC1(html.Div):
         self.fig = go.Figure()
     
 
-    def make_car_bubbles(self, coefficients)->go.Figure:
-    # get width and height of image PIL
+    def update(self, car_type, month)->go.Figure:
+
+        # get width and height of image PIL
         img_width, img_height = self.image.size
         scale_factor = 4
+
         # Filter the data on car_type and month
         filtered_df = filter_data(self.df, [car_type, month])
         if filtered_df.empty:
@@ -59,9 +61,6 @@ class MC1(html.Div):
     
         # Compute the average count for each gate
         count_by_location["avg_count"] = count_by_location["count"].div(number_of_days).round(2)
-        # get width and height of image PIL
-        img_width, img_height = self.image.size
-        scale_factor = 3
 
         # Create the columns for x, y, and location values
         x_values = [x[0]*scale_factor for x in self.locations['coordinates']]
@@ -107,11 +106,5 @@ class MC1(html.Div):
         )
 
         fig.update_traces(hoverinfo="none", hovertemplate=None)
-
-        return fig
-
-    def update(self, car_type):
-        trainer = model_trainer()
-        fig = self.make_car_bubbles(trainer.run_prediction(car_type))
 
         return fig

@@ -24,7 +24,7 @@ class Hover_plot(html.Div):
         # Find which gate is being hovered on
         gate = ""
         for index, value in self.locations.iterrows():
-            if value["coordinates"][0] * 3 == point[0] and (200 - value["coordinates"][1]) * 3 == point[1]:
+            if value["coordinates"][0] * 4 == point[0] and (200 - value["coordinates"][1]) * 4 == point[1]:
                 gate = value["location"]
         
 
