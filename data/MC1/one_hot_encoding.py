@@ -47,7 +47,7 @@ class OneHotEncoding():
                 if (coordinate[2]== color).all():
                     names.append(improved_locations[0])
                     improved_locations.pop(0)
-                    xy_coordinates.append([coordinate[1], 200-coordinate[0]])
+                    xy_coordinates.append([coordinate[1], coordinate[0]])
 
         dict_coordinates = dict(zip(names, xy_coordinates))
         

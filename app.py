@@ -6,6 +6,8 @@ from src.plots.MC1 import MC1
 from src.plots.entrance_plot import Entrance_plot
 from src.plots.coefficient_plot import Coefficient_plot
 from src.plots.speed_bar_plot import SpeedBar
+from src.plots.regression_plot import Regression_plot
+
 
 from dash import html, ctx, dcc
 from dash.dependencies import Input, Output
@@ -13,6 +15,7 @@ import pandas as pd
 
 
 if __name__ == '__main__':
+
     # read in data 
     original_df = pd.read_csv("data\MC1\SensorData.csv")
     df_speed = pd.read_csv("data\MC1\speed.csv")
@@ -20,8 +23,11 @@ if __name__ == '__main__':
     # Create instances for visualizations
     mc1 = MC1("mc1")
     speedbar = SpeedBar("speedbar", df_speed)
+
     entrance = Entrance_plot("entrance")
-    coefficient = Coefficient_plot("coefficient")
+    regression = Regression_plot("regression")
+    map = MC1("map")
+
 
     # Create the app
     app.layout = html.Div(
@@ -39,6 +45,7 @@ if __name__ == '__main__':
                 className="seven columns",
                 children=[
                     mc1
+
                 ]
             ),
 
@@ -48,34 +55,32 @@ if __name__ == '__main__':
                 className="five columns",
                 children=[
                     generate_control_card(original_df),
-                    speedbar
+                    speedbar,
+                    regression
                 ]
             ),
         ]
     )
 
-    # @app.callback(
-    #     Output(entrance.html_id, "figure"),
-    #     Input("car_type", "value"),
-    #     Input("month", "value")        
-    # )
-    # def update_entrance(car_type, month):
-    #     return entrance.update(car_type, month, ctx.triggered_id)
-
+    # Callback for the map plot
     @app.callback(
-        Output(mc1.html_id, "figure"), [
-        Input(mc1.html_id, "clickData"),
-        Input("car_type", "value")
+        Output(map.html_id, "figure"), [
+        Input("car_type", "value"),
+        Input("month", "value")
         ]
     )
-    def update(click_data, car_type):
-        return mc1.update(car_type)
-    
-    # @app.callback(Output(coefficient.html_id, "figure"),
-    #               Input(coefficient.html_id, "clickData")
-    # )
-    # def update(click_data):
-    #     return coefficient.update()
+    def update_map(car_type, month):
+        return map.update(car_type, month)
+
+    # Callback for the regression plot
+    @app.callback(
+        Output(regression.html_id, "figure"), [
+        Input("car_type", "value"),
+        Input("month", "value")
+        ]
+    )
+    def update_regression(car_type, month):
+        return regression.update(car_type, month)
 
     @app.callback(
         Output(speedbar.html_id, "figure"), 
