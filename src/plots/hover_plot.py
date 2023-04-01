@@ -42,6 +42,16 @@ class Hover_plot(html.Div):
 
         data_per_type["percentage"] = round((data_per_type["count"] / total_count) * 100, 2)
 
-        fig = px.bar(data_per_type, x="car-type", y="percentage", hover_data=["percentage", "count"], width=400, height= 300)
+        data_per_type.replace({"car-type": {"1": "Two-axle car", 
+                                            "2": "Two-axle truck",
+                                            "2P": "Two-axle truck (Park service)",
+                                            "3": "Three-axle truck",
+                                            "4": "Four-axle (and above) truck",
+                                            "5": "Two-axle bus",
+                                            "6": "Three-axle bus"}}, inplace=True)
+        # print(data_per_type)
+
+        fig = px.bar(data_per_type, x="car-type", y="percentage", hover_data=["percentage", "count"], 
+                     width=400, height=400, title="Gate: " + gate + "| Total count:" + str(total_count))
 
         return fig
