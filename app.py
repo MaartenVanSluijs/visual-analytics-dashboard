@@ -37,7 +37,7 @@ if __name__ == '__main__':
         children=[
             dcc.Store("selected_points"),
             dcc.ConfirmDialog(id="more_than_2", message="You can only select two points, you can clear the selection to select other points"),
-            dcc.ConfirmDialog(id='popup', message='Cars have not driven between these points, or the are not direct neighbours'),
+            dcc.ConfirmDialog(id='popup', message='Too few cars have driven between these points, or the are not direct neighbours'),
             html.Header(
                 id="header",
                 className="twelve columns", 
@@ -112,12 +112,9 @@ if __name__ == '__main__':
     def update_store(click_data, n_clicks_button, n_clicks_reset, data, month, car_type):
         # In case either of the buttons is pressed
         if ctx.triggered_id == "reset":
-            speed_bar_update(car_type, month, [None, None])
             return [None, None]
         
         if ctx.triggered_id == "button":
-            if data[1] != None:
-                speed_bar_update(car_type, month, data)
             return data
 
         # In case the map updates the store
@@ -207,11 +204,16 @@ if __name__ == '__main__':
     @app.callback(
         Output(regression.html_id, "figure"), [
         Input("car_type", "value"),
-        Input("month", "value")
+        Input("month", "value"),
+        Input("button", "n_clicks"),
+        Input("reset", "n_clicks"),
+        State("selected_points", "data")
         ]
     )
-    def update_regression(car_type, month):
-        return regression.update(car_type, month)
+    def update_regression(car_type, month, n_clicks_1, n_clicks_2, car_path):
+        if ctx.triggered_id == "reset":
+            return regression.update(car_type, month, [None, None])
+        return regression.update(car_type, month, car_path)
 
     # Callback for the speed plot
     @app.callback(
@@ -224,6 +226,7 @@ if __name__ == '__main__':
             return speedbar.update(car_type, month, car_path)
         
     def is_neighbour(gate, point):
+        neighbour = True
         new_point = [int(point[0] / 4), int(200 - (point[1] / 4))]
         current_point = locations.loc[locations["location"] == gate]["coordinates"].to_list()[0]
         
@@ -231,7 +234,12 @@ if __name__ == '__main__':
                                        (df_speed["end-x"] == new_point[0]) & (df_speed["end-y"] == new_point[1])) |
                                       ((df_speed["end-x"] == current_point[0]) & (df_speed["end-y"] == current_point[1]) &
                                        (df_speed["start-x"] == new_point[0]) & (df_speed["start-y"] == new_point[1]))]
-        return not speed_filtered.empty
+        
+        speed_filtered["day"] = pd.to_datetime(speed_filtered["start-time"]).dt.date
+        if len(speed_filtered.groupby("day")) < 15:
+            neighbour = False
+
+        return neighbour
 
     
     app.run_server(debug=True, dev_tools_ui=True)

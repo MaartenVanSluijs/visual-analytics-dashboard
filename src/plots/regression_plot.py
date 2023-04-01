@@ -20,12 +20,12 @@ class Regression_plot(html.Div):
 
         self.df = pd.read_csv("data//MC1//regression_data.csv")
 
-    def update(self, car_type, month):
-        # print(car_type, month)
-        filtered_df = get_regression_data(car_type, month)
+    def update(self, car_type, month, car_path):
+        filtered_df = get_regression_data(car_type, month, car_path)
 
         if filtered_df.empty:
             print("This dataframe is empty")
+            filtered_df = get_regression_data(car_type, month, [None, None])
 
         test_data = self.run_regression(filtered_df).sort_values(by="day")
 

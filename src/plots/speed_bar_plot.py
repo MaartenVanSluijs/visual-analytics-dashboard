@@ -17,7 +17,7 @@ class SpeedBar(html.Div):
 
     def update(self, car_type, month, car_path):
         self.fig = go.Figure()
-        print(car_path)
+        # print(car_path)
 
         # # Filter dataset on specific path
         # df = self.df
