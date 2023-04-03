@@ -56,8 +56,11 @@ class MC1(html.Div):
         return chgd_plotly_color
     
     def get_path_df(self, chosen_locations, scale_factor):
-        # create an 200 - 200 matrix with all zeros
-        path_coordinates = self.paths[(17, 67)][(18, 95)]
+        # create a 200 - 200 matrix with all zeros
+        point1 = self.locations.loc[self.locations["location"] == chosen_locations[0]]["coordinates"].to_list()[0]
+        point2 = self.locations.loc[self.locations["location"] == chosen_locations[1]]["coordinates"].to_list()[0]
+
+        path_coordinates = self.paths[(point1[0], point1[1])][point2[0], point2[1]]
         df_path = pd.DataFrame(np.zeros((200*scale_factor, 200*scale_factor)))
         line_width = 2
         value = scale_factor
@@ -103,13 +106,13 @@ class MC1(html.Div):
             last_coordinate = coordinate
         return df_path
 
-    def update(self, car_type, month)->go.Figure:
+    def update(self, car_type, month, car_path)->go.Figure:
         # get width and height of image PIL
         img_width, img_height = self.image.size
         scale_factor = 4
 
         # Filter the data on car_type and month
-        filtered_df = filter_data(self.df, [car_type, month, [None, None]])
+        filtered_df = filter_data(self.df, [car_type, month, car_path])
         if filtered_df.empty:
             print("This dataframe is empty")
 
@@ -139,13 +142,18 @@ class MC1(html.Div):
 
         # Construct the dataframe
         df_plot = pd.DataFrame({"x": x_values, "y": y_values, "location_type": location_type, "size": count_by_location["avg_count"]})
-        df_paths = self.get_path_df(None, scale_factor)
+        
+        # If a car_path is given
+        if car_path[1] is not None:
+            df_paths = self.get_path_df(car_path, scale_factor)
+            heatmap = go.Heatmap(z=df_paths, colorscale=self.change_colors_heatmap(px.colors.sequential.Bluered, opacity=0.95), showscale=False)
+        else:
+            heatmap = go.Heatmap(z=self.locations, colorscale=self.change_colors_heatmap(px.colors.sequential.Bluered, opacity=0.95), showscale=False)
 
         location_types = df_plot["location_type"].unique()
         colors = ['orange', 'green', 'red', 'blue', 'purple', 'yellow']
 
         # Make the scatter to be overlayed on the image
-        heatmap = go.Heatmap(z=df_paths, colorscale=self.change_colors_heatmap(px.colors.sequential.Bluered, opacity=0.95), showscale=False)
         scatters = []
         min_size = 5
         legend_size = 10
@@ -155,9 +163,17 @@ class MC1(html.Div):
                                  marker=dict(size=df_plot_filtered["size"].apply(lambda x: x if x >= min_size else min_size), 
                                                      color=color, opacity=0.8), name=location_type)
             scatters.append(scatter)
+
         
-        fig = go.Figure(data=[heatmap, *scatters])
-# place legend at top right
+        # If car_path exists
+        if car_path[1] is not None:
+            data = [heatmap, *scatters]
+        else:
+            data = [*scatters]
+
+        fig = go.Figure(data=data)
+        
+        # place legend at top right
         fig.update_layout(legend= {'itemsizing': 'constant', 'title': {'text': 'Average count per day'}, 'yanchor': 'top', 'y': 0.99, 'xanchor': 'right', 'x': 0.99, 'font': {'size': legend_size}})
 
         fig.update_xaxes(

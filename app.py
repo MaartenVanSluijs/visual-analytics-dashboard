@@ -172,11 +172,16 @@ if __name__ == '__main__':
     @app.callback(
         Output(map.html_id, "figure"), [
         Input("car_type", "value"),
-        Input("month", "value")
+        Input("month", "value"),
+        Input("button", "n_clicks"),
+        Input("reset", "n_clicks"),
+        State("selected_points", "data")
         ]
     )
-    def update_map(car_type, month):
-        return map.update(car_type, month)
+    def update_map(car_type, month, n_clicks1, n_clicks2, data):
+        if data is not None:
+            return map.update(car_type, month, data)
+        return map.update(car_type, month, [None, None])
     
     # Callback for the hover plot
     @app.callback(
