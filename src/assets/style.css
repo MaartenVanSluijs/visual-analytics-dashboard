@@ -1,5 +1,5 @@
 body {
-    background-color: #E7DFDD;
+    background-color: #fff;
     color: #000;
     font-family: "Helvetica Neue", Arial, sans-serif;
     font-size: 15px;
@@ -14,7 +14,7 @@ body {
 }
 
 #right-column {
-    background-color: #E7DFDD;
+    background-color: #fff;
     padding: 0rem;
     min-height: 100vh;
     margin-left: 10px;
@@ -41,17 +41,17 @@ h1 {
 }
 
 #control-card {
-    background-color: #E7DFDD;
+    background-color: #fff;
     border-radius: 0.675rem;
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 .graph_card {
-    background-color: #E7DFDD;
+    background-color: #fff;
     border-radius: 0.675rem;
-    padding: 1rem;
+    padding: 0.5rem;
     margin: auto;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 
