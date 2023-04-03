@@ -6,6 +6,38 @@ body {
     margin: 0px;
 }
 
+#title {
+    background-color: #1B5299;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+#filters {
+    background-color: #1B5299;
+    display: flex;
+    justify-content: space-between;
+}
+
+#text {
+    background-color: #1B5299;
+    display: flex;
+}
+
+#month {
+    min-width: 500px;
+}
+
+.rc-slider-mark-text-active {
+    color: #fff;
+    rotate: 45;
+}
+
+.header_element {
+    display: flex;
+    width: 20vw;
+}
+
 #left-column {
     padding: 5px;
     display: flex;
@@ -21,14 +53,14 @@ body {
 }
 
 h5 {
-    color: #000;
+    color: #fff;
     font-weight: 300;
 }
 
 h1 {
-    margin: 20px 0px;
-    color: #4717F6;
-    font-weight: 800;
+    margin: 0px 0px;
+    color: #F1ECCE;
+    font-weight: 1000;
 }
 
 #intro {

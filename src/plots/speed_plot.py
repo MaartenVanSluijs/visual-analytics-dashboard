@@ -7,6 +7,7 @@ class Speed(html.Div):
     def __init__(self, name, df):
         self.html_id = name.lower().replace(" ", "-")
         self.df = df
+        self.locations = pd.read_parquet("data\MC1\locations.parquet")
         # make sure the timestamps are in datetime format
         self.df['start-time'] = pd.to_datetime(self.df["start-time"])
         self.df['end-time'] = pd.to_datetime(self.df["end-time"])
@@ -19,7 +20,7 @@ class Speed(html.Div):
             ],
         )
 
-    def update(self, car_type, months):
+    def update(self, car_type, months, car_path):
         self.fig = go.Figure()
 
         # Filter dataset on specific cars
@@ -32,7 +33,14 @@ class Speed(html.Div):
         filtered_df = filtered_df.loc[(filtered_df["start-time"].dt.month >= months[0]) & (filtered_df["start-time"].dt.month <= months[1])]
 
         # Filter dataset on specific path
-        # TODOs
+        if car_path[1] is not None:
+            point_1 = self.locations.loc[self.locations["location"] == car_path[0]]["coordinates"].to_list()[0]
+            point_2 = self.locations.loc[self.locations["location"] == car_path[1]]["coordinates"].to_list()[0]
+            
+            filtered_df = filtered_df.loc[((filtered_df["start-x"] == point_1[0]) & (filtered_df["start-y"] == point_1[1]) &
+                                        (filtered_df["end-x"] == point_2[0]) & (filtered_df["end-y"] == point_2[1])) |
+                                        ((filtered_df["end-x"] == point_1[0]) & (filtered_df["end-y"] == point_1[1]) &
+                                        (filtered_df["start-x"] == point_2[0]) & (filtered_df["start-y"] == point_2[1]))]
 
         # Create a pivot table to get all averages per hour
         pivot_table_cars = filtered_df.pivot_table(index=filtered_df["start-time"].dt.hour, columns=filtered_df["car-id"], values="average-speed")
@@ -41,9 +49,11 @@ class Speed(html.Div):
 
         self.fig = px.line(average_speed, average_speed.index, y=average_speed.values, markers=True)
         self.fig.update_layout(
+                title="Average speed during the day",
                 xaxis_title="Hours in the day",
                 yaxis_title="Average speed",
-                yaxis_range=[0, 50]
+                yaxis_range=[20, 40],
+                hovermode="x unified"
             )
 
         return self.fig

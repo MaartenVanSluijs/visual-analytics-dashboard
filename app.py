@@ -37,24 +37,30 @@ if __name__ == '__main__':
     app.layout = html.Div(
         id="app-container",
         children=[
-            dcc.Store("selected_points"),
-            dcc.ConfirmDialog(id="more_than_2", message="You can only select two points, you can clear the selection to select other points"),
-            dcc.ConfirmDialog(id='popup', message='Too few cars have driven between these points, or the are not direct neighbours'),
+
             html.Header(
-                id="header",
-                className="twelve columns", 
-                children=generate_header()
-            ),
+                    id="header",
+                    className="twelve columns", 
+                    children=[
+                                *generate_header(),
+                                dcc.Store("selected_points"),
+                                dcc.ConfirmDialog(id="more_than_2", message="You can only select two points, you can clear the selection to select other points"),
+                                dcc.ConfirmDialog(id='popup', message='Too few cars have driven between these points, or the are not direct neighbours'),
+                                ]
+                              
+                ),
+            
 
             # Left column
             html.Div(
                 id="left-column",
                 className="seven columns",
                 children=[
-                    html.H3(id="points_header", children="Hallo"),
-                    html.Button("Analyze road", id="button", n_clicks=0),
-                    html.Button("Reset selection", id="reset", n_clicks=0),
+                    # html.Button("Analyze road", id="button", n_clicks=0),
+                    # html.Br(),
+                    # html.Button("Reset selection", id="reset", n_clicks=0),
                     map,
+                    html.Br(),
                     regression
                 ]
             ),
@@ -64,7 +70,7 @@ if __name__ == '__main__':
                 id="right-column",
                 className="five columns",
                 children=[
-                    generate_control_card(original_df),
+                    # generate_control_card(original_df),
                     speed,
                     cars, 
                     dcc.Tooltip(id="graph-tooltip")
@@ -222,19 +228,29 @@ if __name__ == '__main__':
     @app.callback(
         Output(speed.html_id, "figure"), 
         Input("car_type", "value"), 
-        Input("month", "value")
+        Input("month", "value"),
+        Input("button", "n_clicks"),
+        Input("reset", "n_clicks"),
+        State("selected_points", "data")
     )
-    def update(car_type, months):
-        return speed.update(car_type, months)
+    def update_speed(car_type, months, n_clicks1, n_clicks2, data):
+        if data is None or ctx.triggered_id == "reset":
+            return speed.update(car_type, months, [None, None])
+        return speed.update(car_type, months, data)
         
     # Callback for the car plot
     @app.callback(
         Output(cars.html_id, "figure"), 
         Input("car_type", "value"), 
-        Input("month", "value")
+        Input("month", "value"),
+        Input("button", "n_clicks"),
+        Input("reset", "n_clicks"),
+        State("selected_points", "data")
     )
-    def update(car_type, months):
-        return cars.update(car_type, months)
+    def update_cars(car_type, months, n_clicks1, n_clicks2, data):
+        if data is None or ctx.triggered_id == "reset":
+            return cars.update(car_type, months, [None, None])
+        return cars.update(car_type, months, data)
         
     def is_neighbour(gate, point):
         neighbour = True

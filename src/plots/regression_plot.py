@@ -32,10 +32,10 @@ class Regression_plot(html.Div):
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=test_data["day"], y=test_data["predicted_value"],
                             mode='lines',
-                            name='Predicted number of cars'))
+                            name='Predicted'))
         fig.add_trace(go.Scatter(x=test_data["day"], y=test_data["current_day"],
                             mode='lines',
-                            name='Actual number of cars'))
+                            name='Actual'))
         
         fig.update_layout(title="Predicted and actual amount of cars",
                           autosize=False,
