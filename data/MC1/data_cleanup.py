@@ -205,8 +205,9 @@ def calculate_speed(df, shortest_path):
 
             row = pd.DataFrame({'start-x': begin[0], 'start-y': begin[1], 'end-x': end[0], 'end-y': end[1], 'start-time': begin_time, 
                                 'end-time': end_time, 'car-id': id_car, "car-type": type_car, "average-speed": average_speed}, index=[0])
-        df_speed = pd.concat([df_speed, row], ignore_index=True)
+            df_speed = pd.concat([df_speed, row], ignore_index=True)
 
     df_speed.to_csv("data\MC1\speed.csv", index=False)
     return df_speed
+
 

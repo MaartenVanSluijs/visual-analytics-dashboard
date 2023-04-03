@@ -4,9 +4,10 @@ from data.MC1.data_cleanup import process_data
 
 from src.plots.MC1 import MC1
 from src.plots.entrance_plot import Entrance_plot
-from src.plots.speed_bar_plot import SpeedBar
+from src.plots.speed_plot import Speed
 from src.plots.regression_plot import Regression_plot
 from src.plots.hover_plot import Hover_plot
+from src.plots.cars_plot import Cars
 
 
 from dash import html, ctx, dcc
@@ -23,12 +24,13 @@ if __name__ == '__main__':
 
     # Create instances for visualizations
     map = MC1("mc1")
-    speedbar = SpeedBar("speedbar", df_speed)
+    speed = Speed("speedbar", df_speed)
 
     entrance = Entrance_plot("entrance")
     regression = Regression_plot("regression")
     map = MC1("map")
     hover = Hover_plot("hover")
+    cars = Cars("cars", df_speed)
 
     # Create the app
     app.layout = html.Div(
@@ -57,7 +59,8 @@ if __name__ == '__main__':
                 className="five columns",
                 children=[
                     generate_control_card(original_df),
-                    speedbar,
+                    speed,
+                    cars, 
                     dcc.Tooltip(id="graph-tooltip")
                 ]
             ),
@@ -72,7 +75,6 @@ if __name__ == '__main__':
         ]
     )
     def update_map(car_type, month):
-        print(car_type, month)
         return map.update(car_type, month)
     
     # Callback for the hover plot
@@ -112,15 +114,20 @@ if __name__ == '__main__':
 
     # Callback for the speed plot
     @app.callback(
-        Output(speedbar.html_id, "figure"), 
+        Output(speed.html_id, "figure"), 
         Input("car_type", "value"), 
-        Input(map.html_id, "clickData"),
+        Input("month", "value")
     )
-    def update(car_type, click_data):
-        if click_data is not None and len(click_data["points"]) >= 2: 
-            start_node = click_data["points"][0]["x"], click_data["points"][0]["y"]
-            end_node = click_data["points"][1]["x"], click_data["points"][1]["y"]
-            return speedbar.update(car_type, start_node, end_node)
+    def update(car_type, months):
+        return speed.update(car_type, months)
 
+    # Callback for the speed plot
+    @app.callback(
+        Output(cars.html_id, "figure"), 
+        Input("car_type", "value"), 
+        Input("month", "value")
+    )
+    def update(car_type, months):
+        return cars.update(car_type, months)
     
     app.run_server(debug=True, dev_tools_ui=True)
