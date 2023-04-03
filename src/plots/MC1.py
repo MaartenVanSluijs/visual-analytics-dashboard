@@ -59,6 +59,7 @@ class MC1(html.Div):
         # create an 200 - 200 matrix with all zeros
         path_coordinates = self.paths[(17, 67)][(18, 95)]
         df_path = pd.DataFrame(np.zeros((200*scale_factor, 200*scale_factor)))
+        line_width = 2
         value = scale_factor
         last_coordinate = None
         for coordinate in path_coordinates:
@@ -69,27 +70,36 @@ class MC1(html.Div):
                 last_x = last_coordinate[0]
                 if y == last_y:
                     if x > last_x:
-                        for i in range(1, scale_factor+1):   
+                        for i in range(1, scale_factor+1):
+                            df_path.loc[y*value-2, x*value-i] = 1
                             df_path.loc[y*value-1, x*value-i] = 1
                             df_path.loc[y*value, x*value-i] = 1
-                            df_path.loc[y*value+1, x*value-i] = 1            
+                            df_path.loc[y*value+1, x*value-i] = 1        
+                            df_path.loc[y*value+2, x*value-i] = 1            
+    
                     else:
                         for i in range(1, scale_factor+1):    
+                            df_path.loc[y*value-2, x*value+i] = 1
                             df_path.loc[y*value-1, x*value+i] = 1
                             df_path.loc[y*value, x*value+i] = 1
-                            df_path.loc[y*value+1, x*value+i] = 1
+                            df_path.loc[y*value+1, x*value+i] = 1        
+                            df_path.loc[y*value+2, x*value+i] = 1     
 
                 elif x == last_x:
                     if y > last_y:
                         for i in range(1, scale_factor+1):    
+                            df_path.loc[y*value-i, x*value-2] = 1     
                             df_path.loc[y*value-i, x*value-1] = 1
                             df_path.loc[y*value-i, x*value] = 1
-                            df_path.loc[y*value-i, x*value+1] = 1            
+                            df_path.loc[y*value-i, x*value+1] = 1 
+                            df_path.loc[y*value-i, x*value+2] = 1           
                     else:
                         for i in range(1, scale_factor+1):    
+                            df_path.loc[y*value+i, x*value-2] = 1     
                             df_path.loc[y*value+i, x*value-1] = 1
                             df_path.loc[y*value+i, x*value] = 1
-                            df_path.loc[y*value+i, x*value+1] = 1
+                            df_path.loc[y*value+i, x*value+1] = 1 
+                            df_path.loc[y*value+i, x*value+2] = 1
             last_coordinate = coordinate
         return df_path
 
@@ -125,15 +135,31 @@ class MC1(html.Div):
         x_values = [x[0]*scale_factor for x in self.locations['coordinates']]
         y_values = [(200-x[1])*scale_factor for x in self.locations['coordinates']]
         location_type = [location[:-1] for location in self.locations["location"]]
+        location_type = [location.replace('ranger-bas', 'ranger-base') for location in location_type]
 
         # Construct the dataframe
         df_plot = pd.DataFrame({"x": x_values, "y": y_values, "location_type": location_type, "size": count_by_location["avg_count"]})
         df_paths = self.get_path_df(None, scale_factor)
 
+        location_types = df_plot["location_type"].unique()
+        colors = ['orange', 'green', 'red', 'blue', 'purple', 'yellow']
+
         # Make the scatter to be overlayed on the image
-        fig = px.scatter(df_plot, x='x', y='y', size='size', color="location_type", color_discrete_map=self.colours)
-        fig.add_trace(go.Heatmap(z=df_paths, colorscale=self.change_colors_heatmap(px.colors.sequential.Jet, opacity=0.95), showscale=False))
-    
+        heatmap = go.Heatmap(z=df_paths, colorscale=self.change_colors_heatmap(px.colors.sequential.Bluered, opacity=0.95), showscale=False)
+        scatters = []
+        min_size = 5
+        legend_size = 10
+        for location_type, color in zip(location_types, colors):
+            df_plot_filtered = df_plot[df_plot["location_type"] == location_type]
+            scatter = go.Scatter(x=df_plot_filtered["x"], y=df_plot_filtered["y"], mode="markers", 
+                                 marker=dict(size=df_plot_filtered["size"].apply(lambda x: x if x >= min_size else min_size), 
+                                                     color=color, opacity=0.8), name=location_type)
+            scatters.append(scatter)
+        
+        fig = go.Figure(data=[heatmap, *scatters])
+# place legend at top right
+        fig.update_layout(legend= {'itemsizing': 'constant', 'title': {'text': 'Average count per day'}, 'yanchor': 'top', 'y': 0.99, 'xanchor': 'right', 'x': 0.99, 'font': {'size': legend_size}})
+
         fig.update_xaxes(
             visible=False,
         )
