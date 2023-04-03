@@ -1,12 +1,15 @@
 import pandas as pd
+from typing import List
 
 months = {1: "2015-05", 2: "2015-06", 3: "2015-07", 4: "2015-08", 5: "2015-09", 6: "2015-10", 7: "2015-11", 8: "2015-12", 9: "2016-01", 10: "2016-02", 11: "2016-03", 12: "2016-04", 13: "2016-05", 14: "2016-06"}
+locations = pd.read_parquet("data\MC1\locations.parquet")
+df_speed = pd.read_csv("data\MC1\speed.csv")
 
 def get_data():
     return pd.read_csv("data\MC1\SensorDataProcessed.csv")
 
 def filter_data(data: pd.DataFrame, varlist):
-    variables = ["car_type", "year-month"]
+    variables = ["car_type", "year-month", "carpath"]
 
     for index, value in enumerate(varlist):
         if value is not None:
@@ -18,10 +21,26 @@ def filter_data(data: pd.DataFrame, varlist):
             elif variable == "year-month":
                 data = data.loc[(pd.to_datetime(data[variable]).dt.date >= pd.Timestamp(months[value[0]]).date()) & 
                                 (pd.to_datetime(data[variable]).dt.date <= pd.Timestamp(months[value[1]]).date())]
-            
+            elif variable == "carpath":
+                if value[1] is not None and value[0] is not None:
+                    car_ids = get_car_id_path(value)
+                    data = data.loc[data["car-id"].isin(car_ids)]
     return data
 
-def get_regression_data(car_type, month):
+def get_car_id_path(selected_locations):
+    coordinates = []
+    for i in selected_locations:
+        coordinates.append(locations.loc[locations['location'] == i, 'coordinates'].values[0])
+
+    speed_filtered = df_speed.loc[((df_speed["start-x"] == coordinates[0][0]) & (df_speed["start-y"] == coordinates[0][1]) &
+                                       (df_speed["end-x"] == coordinates[1][0]) & (df_speed["end-y"] == coordinates[1][1])) |
+                                      ((df_speed["end-x"] == coordinates[0][0]) & (df_speed["end-y"] == coordinates[0][1]) &
+                                       (df_speed["start-x"] == coordinates[1][0]) & (df_speed["start-y"] == coordinates[1][1]))]
+    
+    car_ids_path = speed_filtered['car-id'].unique()
+    return car_ids_path
+
+def get_regression_data(car_type, month, car_path):
     # Read in data
     data = pd.read_csv("data\MC1\SensorDataProcessed.csv")
     # Add date column
@@ -30,6 +49,11 @@ def get_regression_data(car_type, month):
     # Filter out only the desired car type
     if car_type != "0":
         data = data.loc[data["car-type"] == car_type]
+
+    if car_path != None:
+        if car_path[1] is not None and car_path[0] is not None:
+            car_ids = get_car_id_path(car_path)
+            data = data.loc[(data["car-id"].isin(car_ids)) & (data["gate-name"] == car_path[0])]
 
     # Group based on this date
     grouped_data = data.groupby("day", as_index=False).count().rename(columns={"Timestamp": "current_day"}).drop(["car-id", "car-type", "gate-name", "year-month", "x", "y"], axis=1)

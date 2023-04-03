@@ -139,7 +139,7 @@ def shortest_paths():
         if not (list(data.items())[0][1] == 255 and list(data.items())[1][1] == 255 and list(data.items())[2][1] == 255):
             colored_nodes.append(node)
 
-    # print(colored_nodes)
+    print(colored_nodes)
 
     shortest_paths = {}
     extended_shortest_paths = {}
@@ -176,7 +176,6 @@ def calculate_speed(df, shortest_path):
 
         # Create a rolling window of 2
         car_window = car_df.rolling(window=2)
-
         # print(car_df.head(10))
 
         for i, window_df in enumerate(car_window):
@@ -207,7 +206,7 @@ def calculate_speed(df, shortest_path):
                                 'end-time': end_time, 'car-id': id_car, "car-type": type_car, "average-speed": average_speed}, index=[0])
             df_speed = pd.concat([df_speed, row], ignore_index=True)
 
+
     df_speed.to_csv("data\MC1\speed.csv", index=False)
     return df_speed
-
 

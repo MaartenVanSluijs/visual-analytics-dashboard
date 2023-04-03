@@ -40,7 +40,7 @@ class MC1(html.Div):
         scale_factor = 4
 
         # Filter the data on car_type and month
-        filtered_df = filter_data(self.df, [car_type, month])
+        filtered_df = filter_data(self.df, [car_type, month, [None, None]])
         if filtered_df.empty:
             print("This dataframe is empty")
 
@@ -102,7 +102,7 @@ class MC1(html.Div):
             width=img_width * scale_factor,
             height=img_height * scale_factor,
             margin={"l": 0, "r": 0, "t": 0, "b": 0},
-            clickmode="select+event"
+            clickmode="event"
         )
 
         fig.update_traces(hoverinfo="none", hovertemplate=None)
