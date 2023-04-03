@@ -187,21 +187,27 @@ if __name__ == '__main__':
     State("month", "value")
     )
     def display_hover(hover_data, month):
+        print(hover_data)
         if hover_data is None:
             return False, None, None
         
-        pt = hover_data["points"][0]
-        bbox = pt["bbox"]
-        x = pt["x"]
-        y = pt["y"]
+        if hover_data["points"][0]["curveNumber"] != 0:
+            
+            pt = hover_data["points"][0]
+            bbox = pt["bbox"]
+            x = pt["x"]
+            y = pt["y"]
 
-        point = [x,y]
+            point = [x,y]
+            
+            children = [
+                dcc.Graph(figure=hover.get_plot(point, month))
+            ]
+
+            return True, bbox, children
         
-        children = [
-            dcc.Graph(figure=hover.get_plot(point, month))
-        ]
-
-        return True, bbox, children
+        else:
+            return False, None, None
 
     # Callback for the regression plot
     @app.callback(
