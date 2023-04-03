@@ -7,6 +7,7 @@ from matplotlib import image, pyplot
 import  PIL.Image as Image
 from data.MC1.data import get_data, filter_data
 import pandas as pd
+import pickle
 
 class MC1(html.Div):
     def __init__(self, name):
@@ -30,11 +31,69 @@ class MC1(html.Div):
         # Colour codings per gate type
         self.colours = {"camping": "#FF6A00", "entrance": "#4CFF00", "gate": "#FF0000", "general-gate": "#00FFFF", "ranger-bas": "#FF00DC", "ranger-stop": "#FFD800"}
 
+        self.paths = self.read_pickle_paths("data/MC1/extended_shortest_paths.pickle")
+
         self.fig = go.Figure()
+
+    def read_pickle_paths(self, path):
+        with open(path, 'rb') as handle:
+            extended_shortest_paths = pickle.load(handle)
+        return extended_shortest_paths
     
+    def change_colors_heatmap(self, plotly_color, opacity=1.0):
+        # set empty list
+        chgd_plotly_color=[]
+
+        # loop over colors in list
+        for index, color in enumerate(plotly_color):
+                color_string = color.replace('rgb', 'rgba')
+                if index == 0:
+                    pass
+                    color_string = color_string.replace(')',f', {str(0)})')
+                else:
+                    color_string = color_string.replace(')',f', {str(opacity)})')
+                chgd_plotly_color.append(color_string)
+        return chgd_plotly_color
+    
+    def get_path_df(self, chosen_locations, scale_factor):
+        # create an 200 - 200 matrix with all zeros
+        path_coordinates = self.paths[(17, 67)][(18, 95)]
+        df_path = pd.DataFrame(np.zeros((200*scale_factor, 200*scale_factor)))
+        value = scale_factor
+        last_coordinate = None
+        for coordinate in path_coordinates:
+            y = 200-coordinate[1]
+            x = coordinate[0]
+            if last_coordinate != None:
+                last_y = 200-last_coordinate[1]
+                last_x = last_coordinate[0]
+                if y == last_y:
+                    if x > last_x:
+                        for i in range(1, scale_factor+1):   
+                            df_path.loc[y*value-1, x*value-i] = 1
+                            df_path.loc[y*value, x*value-i] = 1
+                            df_path.loc[y*value+1, x*value-i] = 1            
+                    else:
+                        for i in range(1, scale_factor+1):    
+                            df_path.loc[y*value-1, x*value+i] = 1
+                            df_path.loc[y*value, x*value+i] = 1
+                            df_path.loc[y*value+1, x*value+i] = 1
+
+                elif x == last_x:
+                    if y > last_y:
+                        for i in range(1, scale_factor+1):    
+                            df_path.loc[y*value-i, x*value-1] = 1
+                            df_path.loc[y*value-i, x*value] = 1
+                            df_path.loc[y*value-i, x*value+1] = 1            
+                    else:
+                        for i in range(1, scale_factor+1):    
+                            df_path.loc[y*value+i, x*value-1] = 1
+                            df_path.loc[y*value+i, x*value] = 1
+                            df_path.loc[y*value+i, x*value+1] = 1
+            last_coordinate = coordinate
+        return df_path
 
     def update(self, car_type, month)->go.Figure:
-
         # get width and height of image PIL
         img_width, img_height = self.image.size
         scale_factor = 4
@@ -69,11 +128,12 @@ class MC1(html.Div):
 
         # Construct the dataframe
         df_plot = pd.DataFrame({"x": x_values, "y": y_values, "location_type": location_type, "size": count_by_location["avg_count"]})
-        
+        df_paths = self.get_path_df(None, scale_factor)
+
         # Make the scatter to be overlayed on the image
-        fig = px.scatter(df_plot, x='x', y='y', size='size', color="location_type", color_discrete_map=self.colours) 
-
-
+        fig = px.scatter(df_plot, x='x', y='y', size='size', color="location_type", color_discrete_map=self.colours)
+        fig.add_trace(go.Heatmap(z=df_paths, colorscale=self.change_colors_heatmap(px.colors.sequential.Jet, opacity=0.95), showscale=False))
+    
         fig.update_xaxes(
             visible=False,
         )

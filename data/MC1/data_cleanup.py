@@ -5,6 +5,7 @@ from PIL import Image
 import networkx as nx
 import numpy as np
 import matplotlib.image as mpimg
+import pickle
 
 def process_data():
     # Read in the data
@@ -158,6 +159,10 @@ def shortest_paths():
                     continue
 
     # print(shortest_paths)
+    
+    # save extended_shortest_paths to parquet file
+    with open('data/MC1/extended_shortest_paths.pickle', 'wb') as handle:
+        pickle.dump(extended_shortest_paths, handle, protocol=pickle.HIGHEST_PROTOCOL)
     
     return shortest_paths, extended_shortest_paths
 
