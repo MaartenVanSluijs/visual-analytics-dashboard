@@ -155,20 +155,36 @@ class MC1(html.Div):
 
         # Make the scatter to be overlayed on the image
         scatters = []
-        min_size = 5
+        # min_size = 5
+        small_list = ['4', '5', '6']
+        if car_type == '0':
+            max_size = 35
+        elif car_type == '1':
+            max_size = 30
+        elif car_type in small_list:
+            max_size = 13
+        else:
+            max_size = 20
         legend_size = 10
+        sizeref = df_plot["size"].max() / max_size ** 2
+        # rescale df_plot['size'] so the highest value is increased to 60 and the rest of the values are scaled accordingly
+        df_plot['size'] = df_plot['size'].apply(lambda x: x * (max_size / df_plot['size'].max()))
+        print(df_plot["size"])
+
         for location_type, color in zip(location_types, colors):
             df_plot_filtered = df_plot[df_plot["location_type"] == location_type]
             scatter = go.Scatter(x=df_plot_filtered["x"], y=df_plot_filtered["y"], mode="markers", 
-                                 marker=dict(size=df_plot_filtered["size"].apply(lambda x: x if x >= min_size else min_size), 
+                                 marker=dict(size=df_plot_filtered["size"], sizeref=sizeref, sizemode='area', 
                                                      color=color, opacity=0.8), name=location_type)
+            
             scatters.append(scatter)
 
 
         fig = go.Figure(data=[heatmap, *scatters])
         
         # place legend at top right
-        fig.update_layout(legend= {'itemsizing': 'constant', 'title': {'text': 'Average count per day'}, 'yanchor': 'top', 'y': 0.99, 'xanchor': 'right', 'x': 0.99, 'font': {'size': legend_size}})
+        fig.update_layout(legend= {'itemsizing': 'constant', 'title': {'text': 'Average count per day'}, 
+                                   'yanchor': 'top', 'y': 0.99, 'xanchor': 'right', 'x': 0.99, 'font': {'size': legend_size}})
 
         fig.update_xaxes(
             visible=False,

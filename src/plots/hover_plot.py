@@ -20,8 +20,6 @@ class Hover_plot(html.Div):
         self.locations = pd.read_parquet("data\MC1\locations.parquet").sort_values(by="location")
 
     def get_plot(self, point, month, car_type):
-        print(car_type)
-
         # Find which gate is being hovered on
         gate = ""
         for index, value in self.locations.iterrows():
@@ -49,7 +47,6 @@ class Hover_plot(html.Div):
                 total_count = 0
             else:
                 total_count = data_one_car["count"].values[0]
-            print(total_count)
 
         data_per_type.replace({"car-type": {"1": "Two-axle car", 
                                             "2": "Two-axle truck",
