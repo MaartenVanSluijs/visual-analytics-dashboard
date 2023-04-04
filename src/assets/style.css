@@ -17,6 +17,7 @@ body {
     background-color: #1B5299;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 #text {
@@ -26,6 +27,8 @@ body {
 
 #month {
     min-width: 500px;
+    padding: 20px 20px;
+    margin: 20px 20px;
 }
 
 .rc-slider-mark-text-active {
@@ -85,8 +88,6 @@ h1 {
     margin: auto;
     margin-top: 10px;
 }
-
-
 
 .graph_card h6 {
     margin: 0 7px;
