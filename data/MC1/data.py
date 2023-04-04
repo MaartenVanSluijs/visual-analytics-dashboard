@@ -22,7 +22,7 @@ def filter_data(data: pd.DataFrame, varlist):
                 data = data.loc[(pd.to_datetime(data[variable]).dt.date >= pd.Timestamp(months[value[0]]).date()) & 
                                 (pd.to_datetime(data[variable]).dt.date <= pd.Timestamp(months[value[1]]).date())]
             elif variable == "carpath":
-                if value[1] is not None and value[0] is not None:
+                if value[1] is not None:
                     car_ids = get_car_id_path(value)
                     data = data.loc[data["car-id"].isin(car_ids)]
     return data

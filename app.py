@@ -178,11 +178,16 @@ if __name__ == '__main__':
     @app.callback(
         Output(map.html_id, "figure"), [
         Input("car_type", "value"),
-        Input("month", "value")
+        Input("month", "value"),
+        Input("button", "n_clicks"),
+        Input("reset", "n_clicks"),
+        State("selected_points", "data")
         ]
     )
-    def update_map(car_type, month):
-        return map.update(car_type, month)
+    def update_map(car_type, month, n_clicks1, n_clicks2, data):
+        if data is not None:
+            return map.update(car_type, month, data)
+        return map.update(car_type, month, [None, None])
     
     # Callback for the hover plot
     @app.callback(
@@ -193,21 +198,27 @@ if __name__ == '__main__':
     State("month", "value")
     )
     def display_hover(hover_data, month):
+        print(hover_data)
         if hover_data is None:
             return False, None, None
         
-        pt = hover_data["points"][0]
-        bbox = pt["bbox"]
-        x = pt["x"]
-        y = pt["y"]
+        if hover_data["points"][0]["curveNumber"] != 0:
+            
+            pt = hover_data["points"][0]
+            bbox = pt["bbox"]
+            x = pt["x"]
+            y = pt["y"]
 
-        point = [x,y]
+            point = [x,y]
+            
+            children = [
+                dcc.Graph(figure=hover.get_plot(point, month))
+            ]
+
+            return True, bbox, children
         
-        children = [
-            dcc.Graph(figure=hover.get_plot(point, month))
-        ]
-
-        return True, bbox, children
+        else:
+            return False, None, None
 
     # Callback for the regression plot
     @app.callback(
