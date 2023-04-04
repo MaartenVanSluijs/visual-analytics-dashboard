@@ -1,14 +1,12 @@
 from src.main import app
 from src.menu import generate_header, generate_control_card
 from data.MC1.data_cleanup import process_data
-
 from src.plots.MC1 import MC1
 from src.plots.entrance_plot import Entrance_plot
 from src.plots.speed_plot import Speed
 from src.plots.regression_plot import Regression_plot
 from src.plots.hover_plot import Hover_plot
 from src.plots.cars_plot import Cars
-
 
 from dash import html, ctx, dcc
 from dash.exceptions import PreventUpdate
@@ -18,7 +16,7 @@ import pandas as pd
 
 if __name__ == '__main__':
 
-    # read in data 
+    # Read in data 
     original_df = pd.read_csv("data\MC1\SensorData.csv")
     df_speed = pd.read_csv("data\MC1\speed.csv")
     locations = pd.read_parquet("data\MC1\locations.parquet").sort_values(by="location")
@@ -26,7 +24,6 @@ if __name__ == '__main__':
     # Create instances for visualizations
     map = MC1("mc1")
     speed = Speed("speedbar", df_speed)
-
     entrance = Entrance_plot("entrance")
     regression = Regression_plot("regression")
     map = MC1("map")
@@ -49,18 +46,13 @@ if __name__ == '__main__':
                                 ]
                               
                 ),
-            
 
             # Left column
             html.Div(
                 id="left-column",
                 className="seven columns",
                 children=[
-                    # html.Button("Analyze road", id="button", n_clicks=0),
-                    # html.Br(),
-                    # html.Button("Reset selection", id="reset", n_clicks=0),
                     map,
-                    html.Br(),
                     regression
                 ]
             ),
@@ -70,7 +62,6 @@ if __name__ == '__main__':
                 id="right-column",
                 className="five columns",
                 children=[
-                    # generate_control_card(original_df),
                     speed,
                     cars, 
                     dcc.Tooltip(id="graph-tooltip")
@@ -78,6 +69,10 @@ if __name__ == '__main__':
             ),
         ]
     )
+
+#############################################
+##############  Callbacks ###################
+#############################################
 
     # Callback for more than 2 popup
     @app.callback(
@@ -92,6 +87,7 @@ if __name__ == '__main__':
                 return True
         return False
     
+
     # Callback for the popup
     @app.callback(
         Output('popup', 'displayed'),
@@ -174,6 +170,7 @@ if __name__ == '__main__':
 
         return header_text[:-2]
 
+
     # Callback for the map plot
     @app.callback(
         Output(map.html_id, "figure"), [
@@ -235,6 +232,7 @@ if __name__ == '__main__':
             return regression.update(car_type, month, [None, None])
         return regression.update(car_type, month, car_path)
 
+
     # Callback for the speed plot
     @app.callback(
         Output(speed.html_id, "figure"), 
@@ -249,6 +247,7 @@ if __name__ == '__main__':
             return speed.update(car_type, months, [None, None])
         return speed.update(car_type, months, data)
         
+
     # Callback for the car plot
     @app.callback(
         Output(cars.html_id, "figure"), 
@@ -278,5 +277,6 @@ if __name__ == '__main__':
             neighbour = False
 
         return neighbour
+    
     
     app.run_server(debug=True, dev_tools_ui=True)
