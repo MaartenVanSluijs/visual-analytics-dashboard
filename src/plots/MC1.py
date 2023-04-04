@@ -169,7 +169,6 @@ class MC1(html.Div):
         sizeref = df_plot["size"].max() / max_size ** 2
         # rescale df_plot['size'] so the highest value is increased to 60 and the rest of the values are scaled accordingly
         df_plot['size'] = df_plot['size'].apply(lambda x: x * (max_size / df_plot['size'].max()))
-        print(df_plot["size"])
 
         for location_type, color in zip(location_types, colors):
             df_plot_filtered = df_plot[df_plot["location_type"] == location_type]

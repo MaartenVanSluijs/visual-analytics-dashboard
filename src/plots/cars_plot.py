@@ -56,6 +56,8 @@ class Cars(html.Div):
             # calculate the average number of cars per hour over all days
             average_cars_extra = pivot_table_extra.mean(axis=1)
 
+            df_average_cars_extra = pd.DataFrame({'hour': average_cars_extra.index, 'amount of cars': average_cars_extra.values})
+
         # Create a pivot table to get all averages per hour
         # extract the hour from the start-time column
         filtered_df["hour"] = pd.to_datetime(filtered_df["start-time"]).dt.hour
@@ -69,10 +71,12 @@ class Cars(html.Div):
         # calculate the average number of cars per hour over all days
         average_cars = pivot_table.mean(axis=1)
 
-        self.fig = px.line(average_cars, average_cars.index, y=average_cars.values, markers=True)
+        df_average_cars = pd.DataFrame({'hour': average_cars.index, 'amount of cars': average_cars.values})
+
+        self.fig = px.line(df_average_cars, x='hour', y='amount of cars', markers=True)
 
         if car_type != "0":
-            self.fig.add_trace(go.Scatter(x=average_cars_extra.index, y=average_cars_extra.values, mode="lines+markers", name="Selected car type"))
+            self.fig.add_trace(go.Scatter(x=average_cars_extra.index, y=average_cars_extra.values, mode="lines+markers", name="Car type"))
 
         self.fig.update_layout(
                 xaxis_title="Hours in the day",
