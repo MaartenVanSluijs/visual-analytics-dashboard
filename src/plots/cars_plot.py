@@ -8,6 +8,7 @@ class Cars(html.Div):
         self.html_id = name.lower().replace(" ", "-")
         self.df = df
         self.locations = pd.read_parquet("data\MC1\locations.parquet")
+
         # make sure the timestamps are in datetime format
         self.df['start-time'] = pd.to_datetime(self.df["start-time"])
         self.df['end-time'] = pd.to_datetime(self.df["end-time"])
@@ -23,11 +24,12 @@ class Cars(html.Div):
     def update(self, car_type, months, car_path):
         self.fig = go.Figure()
 
+        # Create filtered_df variable 
         filtered_df = self.df
 
-
         # Filter dataset on specific months 
-        filtered_df = filtered_df.loc[(filtered_df["start-time"].dt.month >= months[0]) & (filtered_df["start-time"].dt.month <= months[1])]
+        filtered_df = filtered_df.loc[(filtered_df["start-time"].dt.month >= months[0]) & 
+                                      (filtered_df["start-time"].dt.month <= months[1])]
 
         # Filter dataset on specific path
         if car_path[1] is not None:
@@ -78,7 +80,6 @@ class Cars(html.Div):
                 xaxis_title="Hours in the day",
                 yaxis_title="Average amount of cars",
                 hovermode="x unified"
-                # yaxis_range=[0, 50]
             )
 
         return self.fig
