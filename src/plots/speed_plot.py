@@ -47,15 +47,18 @@ class Speed(html.Div):
 
             average_speed_extra = pivot_table_cars_extra.mean(axis=1)
 
+            df_average_speed_extra = pd.DataFrame({'hour': average_speed_extra.index, 'speed': average_speed_extra.values})
+
         # Create a pivot table to get all averages per hour
         pivot_table_cars = filtered_df.pivot_table(index=filtered_df["start-time"].dt.hour, columns=filtered_df["car-id"], values="average-speed")
 
         average_speed = pivot_table_cars.mean(axis=1)
+        
+        df_average_speed = pd.DataFrame({'hour': average_speed.index, 'speed': average_speed.values})
 
-        self.fig = px.line(average_speed, average_speed.index, y=average_speed.values, markers=True)
+        self.fig = px.line(df_average_speed, x='hour', y='speed', markers=True)
         if car_type != "0":
-            self.fig.add_trace(go.Scatter(x=average_speed_extra.index, y=average_speed_extra.values, mode="lines+markers", name="Selected car type"))
-
+            self.fig.add_trace(go.Scatter(x=df_average_speed_extra['hour'], y=df_average_speed_extra['speed'], mode="lines+markers", name="Car type"))
         self.fig.update_layout(
                 title="Average speed during the day",
                 xaxis_title="Hours in the day",
