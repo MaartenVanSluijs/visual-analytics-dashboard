@@ -148,7 +148,7 @@ class MC1(html.Div):
             df_paths = self.get_path_df(car_path, scale_factor)
             heatmap = go.Heatmap(z=df_paths, colorscale=self.change_colors_heatmap(px.colors.sequential.Bluered, opacity=0.95), showscale=False)
         else:
-            heatmap = go.Heatmap(z=self.locations, colorscale=self.change_colors_heatmap(px.colors.sequential.Bluered, opacity=0.95), showscale=False)
+            heatmap = go.Heatmap(z=self.locations, colorscale=self.change_colors_heatmap(px.colors.sequential.Bluered, opacity=0.95), showscale=False, visible=False)
 
         location_types = df_plot["location_type"].unique()
         colors = ['orange', 'green', 'red', 'blue', 'purple', 'yellow']
@@ -165,12 +165,8 @@ class MC1(html.Div):
             scatters.append(scatter)
 
         
-        # If car_path exists
-        if car_path[1] is not None:
-            data = [heatmap, *scatters]
-        else:
-            data = [*scatters]
 
+        data = [heatmap, *scatters]
         fig = go.Figure(data=data)
         
         # place legend at top right
