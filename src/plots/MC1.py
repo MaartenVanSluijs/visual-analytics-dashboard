@@ -164,10 +164,8 @@ class MC1(html.Div):
                                                      color=color, opacity=0.8), name=location_type)
             scatters.append(scatter)
 
-        
 
-        data = [heatmap, *scatters]
-        fig = go.Figure(data=data)
+        fig = go.Figure(data=[heatmap, *scatters])
         
         # place legend at top right
         fig.update_layout(legend= {'itemsizing': 'constant', 'title': {'text': 'Average count per day'}, 'yanchor': 'top', 'y': 0.99, 'xanchor': 'right', 'x': 0.99, 'font': {'size': legend_size}})

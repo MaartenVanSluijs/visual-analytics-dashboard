@@ -195,10 +195,10 @@ if __name__ == '__main__':
     Output("graph-tooltip", "bbox"),
     Output("graph-tooltip", "children"),
     Input(map.html_id, "hoverData"),
-    State("month", "value")
+    State("month", "value"),
+    State("car_type", "value")
     )
-    def display_hover(hover_data, month):
-        print(hover_data)
+    def display_hover(hover_data, month, car_type):
         if hover_data is None:
             return False, None, None
         
@@ -212,7 +212,7 @@ if __name__ == '__main__':
             point = [x,y]
             
             children = [
-                dcc.Graph(figure=hover.get_plot(point, month))
+                dcc.Graph(figure=hover.get_plot(point, month, car_type))
             ]
 
             return True, bbox, children
