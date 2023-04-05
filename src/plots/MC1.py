@@ -17,6 +17,7 @@ class MC1(html.Div):
         super().__init__(
             className="graph_card",
             children=[
+                html.Abbr("\u003F", title="After performing association rule mining on the data, two main routes where revealed in the data.\n\n route 1: Entrance 1 - General gate 7 - General gate 4 - General gate 1* - General gate 5\n\n route 2: Entrance 2 - General gate 1* - Entrance 3\n\n * (General gate 1 - Ranger stop 2 - Ranger stop 0 - General gate 2) are viewed as one place in the analysis due to going through one means going through all of them "),
                 dcc.Graph(id=self.html_id, clear_on_unhover=True)
             ],
         )
