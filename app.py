@@ -182,7 +182,7 @@ if __name__ == '__main__':
         ]
     )
     def update_map(car_type, month, n_clicks1, n_clicks2, data):
-        if data is not None:
+        if data is not None and ctx.triggered_id == "button":
             return map.update(car_type, month, data)
         return map.update(car_type, month, [None, None])
     
