@@ -15,7 +15,7 @@ def generate_header():
             children=[
                 html.H1(
                     id="header_title",
-                    children="Nature Preserve ",
+                    children="WildWheelsTracker",
                     style={
                         'textAlign': 'center'
                     }),

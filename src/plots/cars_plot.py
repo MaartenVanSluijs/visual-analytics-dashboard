@@ -81,6 +81,7 @@ class Cars(html.Div):
             self.fig.add_trace(go.Scatter(x=average_cars_extra.index, y=average_cars_extra.values, mode="lines+markers", name="Car type"))
 
         self.fig.update_layout(
+                title="Average number of cars during the day",
                 xaxis_title="Hours in the day",
                 yaxis_title="Average amount of cars",
                 hovermode="x unified"
