@@ -112,7 +112,7 @@ class MC1(html.Div):
         scale_factor = 4
 
         # Filter the data on car_type and month
-        filtered_df = filter_data(self.df, [car_type, month, car_path])
+        filtered_df = filter_data(self.df, [car_type, month, [None, None]])
         if filtered_df.empty:
             print("This dataframe is empty")
 
