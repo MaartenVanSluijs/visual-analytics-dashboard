@@ -9,3 +9,16 @@ This dashboard is created using [Dash](https://dash.plotly.com/introduction) and
 `pip install -r requirements.txt`
 3. run app.py: `python app.py`
 4. go to `localhost:8050` in your browser of choice.
+
+
+## File structure
+
+data/MC1 containts the raw data from the challenge, processed data directly read in by the visualizations, and files that did the pre-processing or filtered the data at runtime.
+
+in src/notebooks files are found that were used for testing and analyzing the association rules generated.
+
+src/plots contains the files that produce the plots visible on the visual analytics tool.
+
+src/menu.py generates the page elements that hold the filters and title.
+
+app.py is the main file from which the project needs to be run. This holds the HTML structure for the page, as well as the callbacks that drive the interaction and behaviour of the visualizations.
