@@ -2,7 +2,6 @@ from src.main import app
 from src.menu import generate_header
 from data.MC1.data_cleanup import process_data
 from src.plots.MC1 import MC1
-from src.plots.entrance_plot import Entrance_plot
 from src.plots.speed_plot import Speed
 from src.plots.regression_plot import Regression_plot
 from src.plots.hover_plot import Hover_plot
@@ -24,7 +23,6 @@ if __name__ == '__main__':
     # Create instances for visualizations
     map = MC1("mc1")
     speed = Speed("speedbar", df_speed)
-    entrance = Entrance_plot("entrance")
     regression = Regression_plot("regression")
     map = MC1("map")
     hover = Hover_plot("hover")
@@ -81,6 +79,9 @@ if __name__ == '__main__':
         State("selected_points", "data")
         )
     def display_more_than_two(click_data, data):
+        """
+        This function that chooses whether to display the more than two selected popup or not
+        """
         if data != None:
             # The case where more than 2 points are selected
             if data[1] != None:
@@ -95,6 +96,18 @@ if __name__ == '__main__':
         State("selected_points", "data")
         )
     def display_popup(click_data, data):
+        """
+        This function that chooses whether to display the not neighbour popup or not
+
+        Parameters:
+        ----------
+        click_data (dict): The data of the click on the map
+        data (list): The store of plotly containing car path
+
+        Returns:
+        -------
+        bool: Whether to display the popup or not
+        """
         if data != None:
             # The case where the points are not neighbours
             if data[0] != None and data[1] == None:
@@ -115,6 +128,22 @@ if __name__ == '__main__':
         State("car_type", "value")
     )
     def update_store(click_data, n_clicks_button, n_clicks_reset, data, month, car_type):
+        """
+        This function updates the store of plotly
+
+        Parameters:
+        ----------
+        click_data (dict): The data of the click on the map
+        n_clicks_button (int): The number of clicks on the button
+        n_clicks_reset (int): The number of clicks on the reset button
+        data (list): The store of plotly containing car path
+        month (list): The months selected 
+        car_type (str): The car type selected
+
+        Returns:
+        -------
+        store_data (list): The updated store of plotly containing car path
+        """
         # In case either of the buttons is pressed
         if ctx.triggered_id == "reset":
             return [None, None]
@@ -162,6 +191,17 @@ if __name__ == '__main__':
         Input("selected_points", "data")
     )
     def update_header(data):
+        """
+        This function updates the header text
+
+        Parameters:
+        ----------
+        data (list): The store of plotly containing car path
+
+        Returns:
+        -------
+        header_text (str): The text that is displayed in the header
+        """
         header_text = "Currently selected points: "
         
         for gate in data:
@@ -187,7 +227,15 @@ if __name__ == '__main__':
 
         Parameters:
         ----------
-        car_type: 
+        car_type (str): The type of car that is selected
+        month (list): The months that are selected
+        n_clicks1 (int): The number of times the button has been clicked
+        n_clicks2 (int): The number of times the reset button has been clicked
+        data (list): The data of the selected points
+
+        Returns:
+        ----------
+        fig (go.Figure): The figure of the map plot
         """
         if data is not None and ctx.triggered_id != "reset":
             return map.update(car_type, month, data)

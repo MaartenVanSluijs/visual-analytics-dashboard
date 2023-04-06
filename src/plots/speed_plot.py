@@ -21,6 +21,19 @@ class Speed(html.Div):
         )
 
     def update(self, car_type, months, car_path):
+        """
+        This function updates the speed graph with the new data from the callback
+
+        Parameters:
+        ----------
+        car_type (str): The type of car that is selected
+        months (list): The months that are selected
+        car_path (list): The two points that are selected
+
+        Returns:
+        -------
+        fig (go.Figure()): The updated figure
+        """
         self.fig = go.Figure()
 
         filtered_df = self.df

@@ -87,6 +87,19 @@ def get_car_id_path(selected_locations):
     return car_ids_path
 
 def get_regression_data(car_type, month, car_path):
+    """
+    This function returns the data for the regression model
+
+    Parameters:
+    -----------
+    car_type (str): The car type to filter on
+    month (list): The start and end month to filter on
+    car_path (list): The start and end location to filter on
+
+    Returns:
+    --------
+    grouped_data (pd.DataFrame): The data for the regression model
+    """
     # Read in data
     data = pd.read_csv("data\MC1\SensorDataProcessed.csv")
     # Add date column

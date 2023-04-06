@@ -22,6 +22,19 @@ class Cars(html.Div):
         )
 
     def update(self, car_type, months, car_path):
+        """
+        This function updates the cars graph with the new data from the callback
+
+        Parameters:
+        ----------
+        car_type (str): The type of car that is selected
+        months (list): The months that are selected
+        car_path (list): The two points that are selected
+
+        Returns:
+        -------
+        fig (go.Figure()): The updated figure
+        """
         self.fig = go.Figure()
 
         # Create filtered_df variable 
@@ -73,6 +86,7 @@ class Cars(html.Div):
         # calculate the average number of cars per hour over all days
         average_cars = pivot_table.mean(axis=1)
 
+        # create a dataframe from the average cars to able to label the hover
         df_average_cars = pd.DataFrame({'hour': average_cars.index, 'amount of cars': average_cars.values})
 
         self.fig = px.line(df_average_cars, x='hour', y='amount of cars', markers=True)
