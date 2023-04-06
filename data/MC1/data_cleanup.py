@@ -8,6 +8,14 @@ import matplotlib.image as mpimg
 import pickle
 
 def process_data():
+    """
+    This function reads in the data, cleans it and saves it to a new csv file.
+
+    Returns:
+    --------
+    df (pandas.DataFrame): The dataframe containing the cleaned data.
+    df_speed (pandas.DataFrame): The dataframe containing the speed data.
+    """
     # Read in the data
     df = pd.read_csv("data\MC1\SensorData.csv")
 
@@ -37,9 +45,11 @@ def add_coordinates(df):
     This function adds x and y coordinates to the dataframe based on the location of the gates in the map image.
 
     Parameters:
+    -----------
     df (pandas.DataFrame): The dataframe containing the gate names that need coordinates.
 
     Returns:
+    --------
     df (pandas.DataFrame): The dataframe with x and y coordinates added.
     """
 
@@ -92,15 +102,17 @@ def add_coordinates(df):
     for row, data in df.iterrows():
         df.loc[row, 'x'] = dict_coordinates[data['gate-name']][0]
         df.loc[row, 'y'] = dict_coordinates[data['gate-name']][1]
-
     return df
 
 
 def shortest_paths(): 
     '''
-    Adds pixels as nodes in a graph and performs a shortest-path algorithm on all combinations of colored pixels
-    @ returns shortest_path: a nested dictionary containing the distance in miles between each combination of colored pixels
-    @ returns extended_shortest_path: a nested dictionary containing the specific pixels in each path between colored pixels
+    This function calculates the shortest paths between all the gates in the map image.
+
+    Returns:
+    --------
+    shortest_path (dict): A dictionary containing the shortest paths between all the gates.
+    extended_shortest_path (dict): A dictionary containing the shortest paths between all the gates, including the pixels coordinates of the paths.
     '''
     # Open the image 
     im = Image.open("data\MC1\Lekagul Roadways.bmp").convert("RGBA")

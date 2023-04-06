@@ -263,6 +263,15 @@ if __name__ == '__main__':
         return cars.update(car_type, months, data)
         
     def is_neighbour(gate, point):
+        """
+        This function checks if the point is a neighbour of the gate.
+
+        Parameters:
+        ----------
+        gate (str): The gate that is being checked.
+        point (list): The point that is being checked.
+        
+        """
         neighbour = True
         new_point = [int(point[0] / 4), int(200 - (point[1] / 4))]
         current_point = locations.loc[locations["location"] == gate]["coordinates"].to_list()[0]

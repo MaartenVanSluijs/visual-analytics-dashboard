@@ -121,6 +121,19 @@ class MC1(html.Div):
         return df_path
 
     def update(self, car_type, month, car_path)->go.Figure:
+        '''
+        Update the heatmap with the selected data
+
+        Parameters:
+        ----------
+        car_type: selected car type (str)
+        month: selected month (str)
+        car_path: selected path (list of two locations)
+
+        Returns:
+        -------
+        fig: the updated heatmap
+        '''
         # get width and height of image PIL
         img_width, img_height = self.image.size
         scale_factor = 4

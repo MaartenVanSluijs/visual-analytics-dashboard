@@ -126,5 +126,3 @@ def get_regression_data(car_type, month, car_path):
     # grouped_data.to_csv("data//MC1//regression_data.csv", index=False)
     
     return grouped_data
-
-# get_regression_data()
