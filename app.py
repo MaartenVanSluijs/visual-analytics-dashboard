@@ -182,6 +182,13 @@ if __name__ == '__main__':
         ]
     )
     def update_map(car_type, month, n_clicks1, n_clicks2, data):
+        """
+        This function updates the map plot
+
+        Parameters:
+        ----------
+        car_type: 
+        """
         if data is not None and ctx.triggered_id != "reset":
             return map.update(car_type, month, data)
         return map.update(car_type, month, [None, None])
@@ -196,6 +203,21 @@ if __name__ == '__main__':
     State("car_type", "value")
     )
     def display_hover(hover_data, month, car_type):
+        """
+        This function displays the hover plot when the user hovers over a point on the map
+
+        Parameters:
+        ----------
+        hover_data (dict): the data of the point the user is hovering over
+        month (list): The months that are selected
+        car_type (str): The type of car that is selected
+
+        Returns:
+        -------
+        bool: whether or not to display the hover plot
+        dict: the bounding box of the point
+        dcc.Graph: the hover plot
+        """
         if hover_data is None:
             return False, None, None
         
@@ -228,6 +250,21 @@ if __name__ == '__main__':
         ]
     )
     def update_regression(car_type, month, n_clicks_1, n_clicks_2, car_path):
+        """
+        This function updates the regression plot.
+
+        Parameters:
+        ----------
+        car_type (str): The type of car that is selected
+        month (list): The months that are selected
+        n_clicks_1 (int): The number of clicks on the button
+        n_clicks_2 (int): The number of clicks on the reset button
+        car_path (list): The path that is selected
+
+        Returns:
+        -------
+        speed.update(car_type, months, data): The updated speed plot
+        """
         if ctx.triggered_id == "reset":
             return regression.update(car_type, month, [None, None])
         return regression.update(car_type, month, car_path)
@@ -243,6 +280,21 @@ if __name__ == '__main__':
         State("selected_points", "data")
     )
     def update_speed(car_type, months, n_clicks1, n_clicks2, data):
+        """
+        This function updates the speed plot.
+
+        Parameters:
+        ----------
+        car_type (str): The type of car that is selected
+        months (list): The months that are selected
+        n_clicks1 (int): The number of clicks on the button
+        n_clicks2 (int): The number of clicks on the reset button
+        data (list): The data that is stored in the store
+
+        Returns:
+        -------
+        speed.update(car_type, months, data): The updated speed plot
+        """
         if data is None or ctx.triggered_id == "reset":
             return speed.update(car_type, months, [None, None])
         return speed.update(car_type, months, data)
@@ -258,19 +310,34 @@ if __name__ == '__main__':
         State("selected_points", "data")
     )
     def update_cars(car_type, months, n_clicks1, n_clicks2, data):
+        """
+        This function updates the car plot.
+
+        Parameters:
+        ----------
+        car_type (str): The type of car that is selected
+        months (list): The months that are selected
+        n_clicks1 (int): The number of clicks on the button
+        n_clicks2 (int): The number of clicks on the reset button
+        data (list): The data of the selected points
+
+        Returns:
+        ----------
+        cars.update(car_type, months, data): The updated car plot
+        """
         if data is None or ctx.triggered_id == "reset":
             return cars.update(car_type, months, [None, None])
         return cars.update(car_type, months, data)
         
     def is_neighbour(gate, point):
         """
-        This function checks if the point is a neighbour of the gate.
+        This function checks if the new point is a neighbour of the gate.
 
         Parameters:
         ----------
-        gate (str): The gate that is being checked.
-        point (list): The point that is being checked.
-        
+        gate (str): The gate that is first selected
+        point (list): The point of the second gate being selected that is being checked.
+
         """
         neighbour = True
         new_point = [int(point[0] / 4), int(200 - (point[1] / 4))]
