@@ -1,14 +1,43 @@
 import pandas as pd
 from typing import List
 
-months = {1: "2015-05", 2: "2015-06", 3: "2015-07", 4: "2015-08", 5: "2015-09", 6: "2015-10", 7: "2015-11", 8: "2015-12", 9: "2016-01", 10: "2016-02", 11: "2016-03", 12: "2016-04", 13: "2016-05", 14: "2016-06"}
+# Define a dictionary to map month numbers to year-month strings
+months = {1: "2015-05", 2: "2015-06", 3: "2015-07", 4: "2015-08", 5: "2015-09", 6: "2015-10",
+          7: "2015-11", 8: "2015-12", 9: "2016-01", 10: "2016-02", 11: "2016-03", 12: "2016-04",
+          13: "2016-05", 14: "2016-06"}
+
+# Load the 'locations' and 'df_speed' dataframes from parquet and CSV files respectively
 locations = pd.read_parquet("data\MC1\locations.parquet")
 df_speed = pd.read_csv("data\MC1\speed.csv")
 
 def get_data():
+    '''
+    Helper function to load data from 'SensorDataProcessed.csv' file
+
+    Returns:
+    --------
+    data : pd.DataFrame
+        A pandas dataframe containing the loaded data
+    '''
     return pd.read_csv("data\MC1\SensorDataProcessed.csv")
 
 def filter_data(data: pd.DataFrame, varlist):
+    '''
+    Filters the input dataframe 'data' based on the specified variables in 'varlist'
+
+    Parameters:
+    -----------
+    data : pd.DataFrame
+        A pandas dataframe containing the data to be filtered
+    varlist : list of variables to filter on
+        A list of 3 items, containing the values to filter on for the variables 'car_type',
+        'year-month', and 'carpath', respectively. If a variable is None, it will not be filtered.
+
+    Returns:
+    --------
+    data : pd.DataFrame
+        A pandas dataframe containing the filtered data
+    '''
     variables = ["car_type", "year-month", "carpath"]
 
     for index, value in enumerate(varlist):
@@ -19,19 +48,36 @@ def filter_data(data: pd.DataFrame, varlist):
                 if value != "0":
                     data = data.loc[data["car-type"] == value]
             elif variable == "year-month":
+                # Filter based on the start and end months
                 data = data.loc[(pd.to_datetime(data[variable]).dt.date >= pd.Timestamp(months[value[0]]).date()) & 
                                 (pd.to_datetime(data[variable]).dt.date <= pd.Timestamp(months[value[1]]).date())]
             elif variable == "carpath":
                 if value[1] is not None:
+                    # Get the car IDs that traveled between the selected locations
                     car_ids = get_car_id_path(value)
                     data = data.loc[data["car-id"].isin(car_ids)]
     return data
 
 def get_car_id_path(selected_locations):
+    """
+    get the car ids that traveled between the selected locations
+
+    Parameters:
+    -----------
+    selected_locations : list of locations
+        A list of 2 items containing strings of the selected locations
+    
+    Returns:
+    --------
+    car_ids_path : list of car ids
+        A list of car ids that traveled between the selected locations
+    """ 
+    # Get the coordinates of the selected locations
     coordinates = []
     for i in selected_locations:
         coordinates.append(locations.loc[locations['location'] == i, 'coordinates'].values[0])
 
+    # Filter out the speed data based on the selected locations
     speed_filtered = df_speed.loc[((df_speed["start-x"] == coordinates[0][0]) & (df_speed["start-y"] == coordinates[0][1]) &
                                        (df_speed["end-x"] == coordinates[1][0]) & (df_speed["end-y"] == coordinates[1][1])) |
                                       ((df_speed["end-x"] == coordinates[0][0]) & (df_speed["end-y"] == coordinates[0][1]) &

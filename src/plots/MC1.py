@@ -22,88 +22,101 @@ class MC1(html.Div):
             ],
         )
         
+        # Load the image of the map
         self.image = Image.open("data\MC1\Lekagul Roadways.bmp")
 
         # Get data and add a day column for identifying the amount of days in the df
         self.df = get_data()
         self.df["day"] = pd.to_datetime(self.df["Timestamp"]).dt.date
-        
-        self.locations = pd.read_parquet("data\MC1\locations.parquet").sort_values(by="location")
-        # Colour codings per gate type
-        self.colours = {"camping": "#FF6A00", "entrance": "#4CFF00", "gate": "#FF0000", "general-gate": "#00FFFF", "ranger-bas": "#FF00DC", "ranger-stop": "#FFD800"}
 
+        # read in the locations parquet
+        self.locations = pd.read_parquet("data\MC1\locations.parquet").sort_values(by="location")
+
+        # Create a dictionary for paths between locations
         self.paths = self.read_pickle_paths("data/MC1/extended_shortest_paths.pickle")
 
-        self.fig = go.Figure()
-
     def read_pickle_paths(self, path):
+        '''
+        Read in the pickle file with the paths between locations
+
+        path: path to the pickle file
+        '''
         with open(path, 'rb') as handle:
             extended_shortest_paths = pickle.load(handle)
         return extended_shortest_paths
     
     def change_colors_heatmap(self, plotly_color, opacity=1.0):
+        """
+        function to change the colors of a heatmap to make all zeros transparent
+
+        Parameters:
+        ----------
+        plotly_color: list of colors in plotly format
+        opacity: opacity of the colors not 0
+
+        Returns:
+        -------
+        chgd_plotly_color: list of colors in plotly format with changed opacities
+        """
         # set empty list
         chgd_plotly_color=[]
 
-        # loop over colors in list
+        # loop over colors in list and change opacities
         for index, color in enumerate(plotly_color):
                 color_string = color.replace('rgb', 'rgba')
+
+                # change opacity of first color to 0
                 if index == 0:
-                    pass
                     color_string = color_string.replace(')',f', {str(0)})')
+
+                # change opacity of other colors to opacity
                 else:
                     color_string = color_string.replace(')',f', {str(opacity)})')
                 chgd_plotly_color.append(color_string)
         return chgd_plotly_color
     
-    def get_path_df(self, chosen_locations, scale_factor):
-        # create a 200 - 200 matrix with all zeros
+    def get_path_df(self, chosen_locations, scale_factor)->pd.DataFrame:
+        '''
+        Get a dataframe with the pixel locations of the path between two locations for the heatmap
+
+        Parameters:
+        ----------
+        chosen_locations: list of two locations (str)
+        scale_factor: scale factor of the heatmap (int)
+
+        Returns:
+        -------
+        df_path: dataframe with the path between the two locations
+        '''
+        # Get the coordinates of the two locations
         point1 = self.locations.loc[self.locations["location"] == chosen_locations[0]]["coordinates"].to_list()[0]
         point2 = self.locations.loc[self.locations["location"] == chosen_locations[1]]["coordinates"].to_list()[0]
 
+        # Get the path between the two locations
         path_coordinates = self.paths[(point1[0], point1[1])][point2[0], point2[1]]
+
+        # create a 200 - 200 scaled matrix with all zeros
         df_path = pd.DataFrame(np.zeros((200*scale_factor, 200*scale_factor)))
         line_width = 2
-        value = scale_factor
         last_coordinate = None
         for coordinate in path_coordinates:
-            y = 200-coordinate[1]
-            x = coordinate[0]
-            if last_coordinate != None:
-                last_y = 200-last_coordinate[1]
-                last_x = last_coordinate[0]
+            x, y = coordinate
+            y = 200 - y  # flip y-coordinate to match df_path
+            if last_coordinate is not None:
+                last_x, last_y = last_coordinate
+                last_y = 200 - last_y  # flip y-coordinate to match df_path
                 if y == last_y:
-                    if x > last_x:
-                        for i in range(1, scale_factor+1):
-                            df_path.loc[y*value-2, x*value-i] = 1
-                            df_path.loc[y*value-1, x*value-i] = 1
-                            df_path.loc[y*value, x*value-i] = 1
-                            df_path.loc[y*value+1, x*value-i] = 1        
-                            df_path.loc[y*value+2, x*value-i] = 1            
-    
-                    else:
-                        for i in range(1, scale_factor+1):    
-                            df_path.loc[y*value-2, x*value+i] = 1
-                            df_path.loc[y*value-1, x*value+i] = 1
-                            df_path.loc[y*value, x*value+i] = 1
-                            df_path.loc[y*value+1, x*value+i] = 1        
-                            df_path.loc[y*value+2, x*value+i] = 1     
-
+                    # draw a horizontal line
+                    start, end = min(x, last_x), max(x, last_x)
+                    for i in range(start, end + 1):
+                        df_path.loc[y*scale_factor - line_width:y*scale_factor + line_width + 1,
+                                    i*scale_factor - line_width:i*scale_factor + line_width + 1] = 1
                 elif x == last_x:
-                    if y > last_y:
-                        for i in range(1, scale_factor+1):    
-                            df_path.loc[y*value-i, x*value-2] = 1     
-                            df_path.loc[y*value-i, x*value-1] = 1
-                            df_path.loc[y*value-i, x*value] = 1
-                            df_path.loc[y*value-i, x*value+1] = 1 
-                            df_path.loc[y*value-i, x*value+2] = 1           
-                    else:
-                        for i in range(1, scale_factor+1):    
-                            df_path.loc[y*value+i, x*value-2] = 1     
-                            df_path.loc[y*value+i, x*value-1] = 1
-                            df_path.loc[y*value+i, x*value] = 1
-                            df_path.loc[y*value+i, x*value+1] = 1 
-                            df_path.loc[y*value+i, x*value+2] = 1
+                    # draw a vertical line
+                    start, end = min(y, last_y), max(y, last_y)
+                    for i in range(start, end + 1):
+                        df_path.loc[i*scale_factor - line_width:i*scale_factor + line_width + 1,
+                                    x*scale_factor - line_width:x*scale_factor + line_width + 1] = 1
             last_coordinate = coordinate
         return df_path
 
@@ -144,10 +157,11 @@ class MC1(html.Div):
         # Construct the dataframe
         df_plot = pd.DataFrame({"x": x_values, "y": y_values, "location_type": location_type, "size": count_by_location["avg_count"]})
         
-        # If a car_path is given
+        # If a car_path is given make a heatmap of the path
         if car_path[1] is not None:
             df_paths = self.get_path_df(car_path, scale_factor)
             heatmap = go.Heatmap(z=df_paths, colorscale=self.change_colors_heatmap(px.colors.sequential.Bluered, opacity=0.95), showscale=False)
+        # if no car_path is given make an invisible heatmap
         else:
             heatmap = go.Heatmap(z=self.locations, colorscale=self.change_colors_heatmap(px.colors.sequential.Bluered, opacity=0.95), showscale=False, visible=False)
 
@@ -168,9 +182,11 @@ class MC1(html.Div):
             max_size = 20
         legend_size = 10
         sizeref = df_plot["size"].max() / max_size ** 2
+
         # rescale df_plot['size'] so the highest value is increased to 60 and the rest of the values are scaled accordingly
         df_plot['size'] = df_plot['size'].apply(lambda x: x * (max_size / df_plot['size'].max()))
 
+        # Loop through all the location types and make a scatter for each
         for location_type, color in zip(location_types, colors):
             df_plot_filtered = df_plot[df_plot["location_type"] == location_type]
             scatter = go.Scatter(x=df_plot_filtered["x"], y=df_plot_filtered["y"], mode="markers", 
@@ -179,13 +195,14 @@ class MC1(html.Div):
             
             scatters.append(scatter)
 
-
+        # Make the figure 
         fig = go.Figure(data=[heatmap, *scatters])
         
         # place legend at top right
         fig.update_layout(legend= {'itemsizing': 'constant', 'title': {'text': 'Average count per day'}, 
                                    'yanchor': 'top', 'y': 0.99, 'xanchor': 'right', 'x': 0.99, 'font': {'size': legend_size}})
 
+        # Make the figure invisible
         fig.update_xaxes(
             visible=False,
         )
@@ -217,6 +234,7 @@ class MC1(html.Div):
             clickmode="event"
         )
 
+        # Make the hovertemplate invisible
         fig.update_traces(hoverinfo="none", hovertemplate=None)
 
         return fig
