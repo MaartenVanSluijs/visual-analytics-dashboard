@@ -13,7 +13,7 @@ This dashboard is created using [Dash](https://dash.plotly.com/introduction) and
 
 ## File structure
 
-The raw data from the challenge, processed data directly read in by the visualizations, and files that did the pre-processing or filtered the data at runtime.
+data/MC1 containts the raw data from the challenge, processed data directly read in by the visualizations, and files that did the pre-processing or filtered the data at runtime.
 
 in src/notebooks files are found that were used for testing and analyzing the association rules generated.
 
